@@ -12,6 +12,8 @@ export default function PaletteCard({
   selected,
   onSelect,
 }: PaletteCardProps) {
+  const { background, secondary, primary, accent } = palette.tokens;
+
   return (
     <button
       type="button"
@@ -24,7 +26,7 @@ export default function PaletteCard({
       }`}
     >
       <div className="flex h-16 overflow-hidden rounded-lg">
-        {palette.colors.map((color) => (
+        {[background, secondary, primary, accent].map((color) => (
           <div
             key={color}
             className="flex-1"
