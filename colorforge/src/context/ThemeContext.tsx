@@ -14,6 +14,14 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     setPalette(nextPalette);
   }
 
+  function selectPaletteById(id: string) {
+    const nextPalette = palettes.find((item) => item.id === id);
+
+    if (nextPalette) {
+      setPalette(nextPalette);
+    }
+  }
+
   function updatePalette(nextPalette: Palette) {
     setPalette(nextPalette);
   }
@@ -41,13 +49,14 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       value={{
         palette,
         selectPalette,
+        selectPaletteById,
         updatePalette,
         updateToken,
         resetPalette,
       }}
     >
       <div
-        className="min-h-screen"
+        className="min-h-screen transition-colors duration-300"
         style={createThemeVariables(palette.tokens)}
       >
         {children}

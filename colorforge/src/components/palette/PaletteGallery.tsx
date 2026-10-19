@@ -15,8 +15,14 @@ export default function PaletteGallery({
   return (
     <section>
       <div className="mb-4">
-        <h3 className="font-semibold text-white">Explore palettes</h3>
-        <p className="mt-1 text-sm text-zinc-400">
+        <h3 className="font-semibold" style={{ color: "var(--cf-foreground)" }}>
+          Explore palettes
+        </h3>
+
+        <p
+          className="mt-1 text-sm"
+          style={{ color: "var(--cf-muted-foreground)" }}
+        >
           Choose a preset to explore its colors.
         </p>
       </div>

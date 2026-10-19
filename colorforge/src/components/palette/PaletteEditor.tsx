@@ -54,11 +54,15 @@ export default function PaletteEditor({
   }
 
   return (
-    <section>
+    <section style={{ color: "var(--cf-foreground)" }}>
       <div className="mb-4 flex items-center justify-between gap-3">
         <div>
-          <h3 className="font-semibold text-white">Design tokens</h3>
-          <p className="mt-1 text-sm text-zinc-400">
+          <h3 className="font-semibold">Design tokens</h3>
+
+          <p
+            className="mt-1 text-sm"
+            style={{ color: "var(--cf-muted-foreground)" }}
+          >
             Customize each semantic color.
           </p>
         </div>
@@ -69,7 +73,12 @@ export default function PaletteEditor({
             setHexValues({});
             onReset();
           }}
-          className="flex items-center gap-2 rounded-lg border border-zinc-800 px-3 py-2 text-xs text-zinc-300 hover:bg-zinc-900"
+          className="flex items-center gap-2 rounded-lg border px-3 py-2 text-xs transition hover:opacity-80"
+          style={{
+            borderColor: "var(--cf-border)",
+            color: "var(--cf-foreground)",
+            backgroundColor: "var(--cf-secondary)",
+          }}
         >
           <RotateCcw size={14} />
           Reset
@@ -83,7 +92,12 @@ export default function PaletteEditor({
           return (
             <div
               key={key}
-              className="flex min-w-0 items-center gap-3 rounded-xl border border-zinc-800 bg-zinc-900 p-3"
+              className="flex min-w-0 items-center gap-3 rounded-xl border p-3 transition-colors"
+              style={{
+                borderColor: "var(--cf-border)",
+                backgroundColor: "var(--cf-secondary)",
+                color: "var(--cf-secondary-foreground)",
+              }}
             >
               <input
                 type="color"
@@ -96,12 +110,15 @@ export default function PaletteEditor({
               <div className="min-w-0 flex-1">
                 <label
                   htmlFor={`token-${key}`}
-                  className="block truncate text-sm font-medium text-zinc-200"
+                  className="block truncate text-sm font-medium"
                 >
                   {label}
                 </label>
 
-                <p className="mb-1 truncate text-xs text-zinc-500">
+                <p
+                  className="mb-1 truncate text-xs"
+                  style={{ color: "var(--cf-muted-foreground)" }}
+                >
                   {description}
                 </p>
 
@@ -113,7 +130,12 @@ export default function PaletteEditor({
                   maxLength={7}
                   spellCheck={false}
                   autoComplete="off"
-                  className="w-full rounded-md border border-zinc-700 bg-zinc-950 px-2 py-1.5 font-mono text-xs uppercase text-white outline-none focus:border-violet-500"
+                  className="w-full rounded-md border px-2 py-1.5 font-mono text-xs uppercase outline-none"
+                  style={{
+                    backgroundColor: "var(--cf-background)",
+                    color: "var(--cf-foreground)",
+                    borderColor: "var(--cf-border)",
+                  }}
                 />
               </div>
             </div>

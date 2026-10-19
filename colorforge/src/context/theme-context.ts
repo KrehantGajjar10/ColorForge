@@ -5,6 +5,7 @@ import type { Palette, ThemeTokens } from "../types";
 export interface ThemeContextValue {
   palette: Palette;
   selectPalette: (palette: Palette) => void;
+  selectPaletteById: (id: string) => void;
   updatePalette: (palette: Palette) => void;
   updateToken: (key: keyof ThemeTokens, value: string) => void;
   resetPalette: () => void;

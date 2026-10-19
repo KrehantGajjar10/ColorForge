@@ -9,22 +9,10 @@ import {
   WandSparkles,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { palettes } from "../data/palettes";
+import { useTheme } from "../context/useTheme";
+import type { Palette as PaletteType } from "../types";
 import "./LandingPage.css";
-
-const themes = [
-  { name: "Matcha", colors: ["#dce8bd", "#9caf88", "#5e7955", "#344b37"] },
-  { name: "Sunset", colors: ["#ffe0b5", "#ffad87", "#e87570", "#8c4560"] },
-  { name: "Lavender", colors: ["#e9e1ff", "#c4b5fd", "#8b7bd8", "#51428a"] },
-  { name: "Ocean", colors: ["#d5f1ed", "#83c9c5", "#368e91", "#20565d"] },
-  { name: "Citrus", colors: ["#f5f2b7", "#d9d66d", "#a0a84d", "#535d30"] },
-  { name: "Rose", colors: ["#f9dce5", "#e9a9bd", "#c66c91", "#763d61"] },
-  { name: "Clay", colors: ["#f0d8c6", "#d5a78b", "#ad765d", "#65483c"] },
-  { name: "Midnight", colors: ["#d8d9e7", "#9699b8", "#555978", "#282a42"] },
-  { name: "Peach", colors: ["#fff0df", "#ffc69c", "#f19b76", "#a95848"] },
-  { name: "Forest", colors: ["#d4e4d3", "#91b69a", "#4f8064", "#2c4d40"] },
-  { name: "Berry", colors: ["#f3d9f4", "#d4a2dc", "#a66ab6", "#603b78"] },
-  { name: "Sand", colors: ["#f4e8d2", "#ddc9a6", "#b29b72", "#716044"] },
-];
 
 const features = [
   {
@@ -59,37 +47,72 @@ function Brand() {
 }
 
 function ThemeStrip({ reverse = false }: { reverse?: boolean }) {
-  const items = reverse ? [...themes].reverse() : themes;
+  const items = reverse ? [...palettes].reverse() : palettes;
+  const { palette, selectPalette } = useTheme();
+
+  function chooseTheme(theme: PaletteType) {
+    selectPalette(theme);
+  }
 
   return (
     <div className="cf-theme-strip">
-      {items.map((theme) => (
-        <Link
-          className="cf-theme-chip"
-          to="/editor"
-          key={`${reverse ? "reverse-" : ""}${theme.name}`}
-          aria-label={`Explore the ${theme.name} theme in the editor`}
-        >
-          <span className="cf-chip-colors" aria-hidden="true">
-            {theme.colors.map((color) => (
-              <span
-                key={color}
-                className="cf-chip-color"
-                style={{ backgroundColor: color }}
-              />
-            ))}
-          </span>
-          <span className="cf-chip-name">{theme.name}</span>
-          <ArrowDownRight className="cf-chip-arrow" size={14} />
-        </Link>
-      ))}
+      {items.map((theme) => {
+        const { background, secondary, primary, accent } = theme.tokens;
+        const selected = palette.id === theme.id;
+
+        return (
+          <button
+            type="button"
+            className={`cf-theme-chip ${selected ? "cf-theme-chip-active" : ""}`}
+            key={`${reverse ? "reverse-" : ""}${theme.id}`}
+            onClick={() => chooseTheme(theme)}
+            aria-pressed={selected}
+            aria-label={`Apply the ${theme.name} theme`}
+          >
+            <span className="cf-chip-colors" aria-hidden="true">
+              {[background, secondary, primary, accent].map((color) => (
+                <span
+                  key={color}
+                  className="cf-chip-color"
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </span>
+            <span className="cf-chip-name">{theme.name}</span>
+            {selected ? (
+              <Check className="cf-chip-arrow" size={14} />
+            ) : (
+              <ArrowDownRight className="cf-chip-arrow" size={14} />
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }
 
 export function LandingPage() {
+  const { palette } = useTheme();
+
   return (
-    <main className="cf-landing">
+    <main
+      className="cf-landing"
+      style={
+        {
+          "--cf-page": "var(--cf-background)",
+          "--cf-ink": "var(--cf-foreground)",
+          "--cf-muted": "var(--cf-muted-foreground)",
+          "--cf-border": "var(--cf-border)",
+          "--cf-accent": "var(--cf-primary)",
+          "--cf-accent-hover": "var(--cf-primary)",
+          "--cf-surface": "var(--cf-secondary)",
+          "--cf-surface-foreground": "var(--cf-secondary-foreground)",
+          "--cf-soft-accent": "var(--cf-accent)",
+          "--cf-soft-accent-foreground": "var(--cf-accent-foreground)",
+        } as React.CSSProperties
+      }
+      data-theme={palette.id}
+    >
       <header className="cf-nav">
         <div className="cf-nav-inner">
           <Brand />
@@ -103,10 +126,10 @@ export function LandingPage() {
           <div className="cf-nav-actions">
             <a
               className="cf-github-link"
-              href="https://github.com/"
+              href="https://github.com/KrehantGajjar10/ColorForge"
               target="_blank"
               rel="noreferrer"
-              aria-label="Visit GitHub"
+              aria-label="View ColorForge on GitHub"
             >
               <ExternalLink size={17} />
               <span>GitHub</span>
@@ -184,7 +207,7 @@ export function LandingPage() {
         </div>
 
         <p className="cf-themes-note">
-          Every palette is a starting point. Make it yours in the editor.
+          {`Currently exploring ${palette.name}. Click any palette to apply it instantly.`}
         </p>
       </section>
 
