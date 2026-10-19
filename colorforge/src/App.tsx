@@ -1,20 +1,30 @@
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AppHeader from "./components/layout/AppHeader";
-import HomePage from "./pages/HomePage";
 import { ThemeProvider } from "./context/ThemeContext";
+import { LandingPage } from "./pages/LandingPage";
+import HomePage from "./pages/HomePage";
 
-export default function App() {
+function EditorPage() {
+  return (
+    <>
+      <AppHeader />
+      <HomePage />
+    </>
+  );
+}
+
+function App() {
   return (
     <ThemeProvider>
-      <div
-        className="min-h-screen"
-        style={{
-          backgroundColor: "var(--cf-background)",
-          color: "var(--cf-foreground)",
-        }}
-      >
-        <AppHeader />
-        <HomePage />
-      </div>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/editor" element={<EditorPage />} />
+          <Route path="*" element={<LandingPage />} />
+        </Routes>
+      </BrowserRouter>
     </ThemeProvider>
   );
 }
+
+export default App;
