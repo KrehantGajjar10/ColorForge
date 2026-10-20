@@ -8,39 +8,51 @@ interface ThemeProviderProps {
 }
 
 const STORAGE_KEY = "colorforge-palette";
+const TOKEN_KEYS = Object.keys(palettes[0].tokens) as (keyof ThemeTokens)[];
 
-function getInitialPalette(): Palette {
-  if (typeof window === "undefined") {
-    return palettes[0];
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isValidTokens(value: unknown): value is ThemeTokens {
+  if (!isRecord(value)) {
+    return false;
   }
 
+  return TOKEN_KEYS.every(
+    (key) =>
+      typeof value[key] === "string" &&
+      /^#[0-9a-fA-F]{6}$/.test(value[key] as string),
+  );
+}
+
+function getInitialPalette(): Palette {
   try {
     const savedPalette = localStorage.getItem(STORAGE_KEY);
 
-    if (savedPalette) {
-      const parsed = JSON.parse(savedPalette) as Palette;
-
-      if (
-        typeof parsed.id === "string" &&
-        palettes.some((item) => item.id === parsed.id) &&
-        parsed.tokens &&
-        Object.keys(palettes[0].tokens).every(
-          (key) => typeof parsed.tokens[key as keyof ThemeTokens] === "string",
-        )
-      ) {
-        const original = palettes.find((item) => item.id === parsed.id)!;
-
-        return {
-          ...original,
-          tokens: { ...original.tokens, ...parsed.tokens },
-        };
-      }
+    if (!savedPalette) {
+      return palettes[0];
     }
-  } catch {
-    // Ignore invalid saved data and use the default palette.
-  }
 
-  return palettes[0];
+    const parsed: unknown = JSON.parse(savedPalette);
+
+    if (!isRecord(parsed) || typeof parsed.id !== "string") {
+      return palettes[0];
+    }
+
+    const original = palettes.find((item) => item.id === parsed.id);
+
+    if (!original || !isValidTokens(parsed.tokens)) {
+      return palettes[0];
+    }
+
+    return {
+      ...original,
+      tokens: { ...original.tokens, ...parsed.tokens },
+    };
+  } catch {
+    return palettes[0];
+  }
 }
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
