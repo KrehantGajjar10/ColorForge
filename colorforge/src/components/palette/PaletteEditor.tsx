@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { RotateCcw } from "lucide-react";
+import { Download, RotateCcw } from "lucide-react";
 import type { Palette, ThemeTokens } from "../../types";
 import { themeTokenDefinitions } from "../../data/themeTokens";
+import { exportPaletteAsJson } from "../../utils/exportPalette";
 
 interface PaletteEditorProps {
   palette: Palette;
@@ -55,34 +56,49 @@ export default function PaletteEditor({
 
   return (
     <section style={{ color: "var(--cf-foreground)" }}>
-      <div className="mb-4 flex items-center justify-between gap-3">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="font-semibold">Design tokens</h3>
-
+          <h3 className="font-semibold">Semantic Colors</h3>
           <p
             className="mt-1 text-sm"
             style={{ color: "var(--cf-muted-foreground)" }}
           >
-            Customize each semantic color.
+            Adjust individual theme colors for specific interface elements
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            setHexValues({});
-            onReset();
-          }}
-          className="flex items-center gap-2 rounded-lg border px-3 py-2 text-xs transition hover:opacity-80"
-          style={{
-            borderColor: "var(--cf-border)",
-            color: "var(--cf-foreground)",
-            backgroundColor: "var(--cf-secondary)",
-          }}
-        >
-          <RotateCcw size={14} />
-          Reset
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => exportPaletteAsJson(palette)}
+            className="flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition hover:opacity-80"
+            style={{
+              borderColor: "var(--cf-border)",
+              color: "var(--cf-foreground)",
+              backgroundColor: "var(--cf-background)",
+            }}
+          >
+            <Download size={14} />
+            Export JSON
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setHexValues({});
+              onReset();
+            }}
+            className="flex items-center gap-2 rounded-lg border px-3 py-2 text-xs transition hover:opacity-80"
+            style={{
+              borderColor: "var(--cf-border)",
+              color: "var(--cf-foreground)",
+              backgroundColor: "var(--cf-secondary)",
+            }}
+          >
+            <RotateCcw size={14} />
+            Reset
+          </button>
+        </div>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
