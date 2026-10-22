@@ -12,14 +12,18 @@ import PaletteEditor from "../components/palette/PaletteEditor";
 import PaletteGallery from "../components/palette/PaletteGallery";
 import PalettePreview from "../components/palette/PalettePreview";
 import SavePaletteDialog from "../components/palette/SavePaletteDialog";
+import SavedPaletteGallery from "../components/palette/SavedPaletteGallery";
 import { useTheme } from "../context/useTheme";
 import { palettes } from "../data/palettes";
 import { createPaletteShareUrl } from "../utils/createPaletteShareUrl";
-import { savePaletteSnapshot } from "../utils/savedPalettes";
+import { getSavedPalettes, savePaletteSnapshot } from "../utils/savedPalettes";
+import type { Palette as PaletteType } from "../types";
 
 export default function HomePage() {
   const { palette, selectPalette, updatePalette, resetPalette } = useTheme();
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
+  const [savedPalettes, setSavedPalettes] =
+    useState<PaletteType[]>(getSavedPalettes);
 
   const displayPalettes = palettes.map((item) =>
     item.id === palette.id ? palette : item,
@@ -46,6 +50,7 @@ export default function HomePage() {
   function handleSavePalette(name: string) {
     try {
       savePaletteSnapshot(palette, name);
+      setSavedPalettes(getSavedPalettes());
       setIsSaveDialogOpen(false);
 
       toast.success("Palette saved", {
@@ -56,6 +61,42 @@ export default function HomePage() {
       toast.error(
         error instanceof Error ? error.message : "Couldn't save this palette.",
       );
+    }
+  }
+
+  function handleLoadPalette(savedPalette: PaletteType) {
+    selectPalette(savedPalette);
+    toast.success("Palette loaded", {
+      description: `"${savedPalette.name}" is now active in the editor.`,
+    });
+  }
+
+  function handleDeletePalette(savedPalette: PaletteType) {
+    const confirmed = window.confirm(
+      `Delete "${savedPalette.name}" from your saved palettes? This cannot be undone.`,
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const remaining = getSavedPalettes().filter(
+        (item) => item.id !== savedPalette.id,
+      );
+
+      localStorage.setItem(
+        "colorforge-saved-palettes",
+        JSON.stringify(remaining),
+      );
+
+      setSavedPalettes(remaining);
+
+      toast.success("Saved palette deleted", {
+        description: `"${savedPalette.name}" was removed from your collection.`,
+      });
+    } catch {
+      toast.error("Couldn't delete this palette", {
+        description: "Your browser couldn't update saved palette storage.",
+      });
     }
   }
 
@@ -196,6 +237,21 @@ export default function HomePage() {
                 palette={palette}
                 onChange={updatePalette}
                 onReset={resetPalette}
+              />
+            </section>
+
+            <section
+              className="min-w-0 rounded-2xl border p-4 sm:p-6"
+              style={{
+                borderColor: "var(--cf-border)",
+                backgroundColor: "var(--cf-secondary)",
+              }}
+            >
+              <SavedPaletteGallery
+                palettes={savedPalettes}
+                selectedId={palette.id}
+                onLoad={handleLoadPalette}
+                onDelete={handleDeletePalette}
               />
             </section>
           </div>
