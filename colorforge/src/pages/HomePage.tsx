@@ -1,14 +1,25 @@
-import { ArrowUpRight, Check, Link2, Palette, Sparkles } from "lucide-react";
+import { useState } from "react";
+import {
+  ArrowUpRight,
+  BookmarkPlus,
+  Check,
+  Link2,
+  Palette,
+  Sparkles,
+} from "lucide-react";
 import { toast } from "sonner";
 import PaletteEditor from "../components/palette/PaletteEditor";
 import PaletteGallery from "../components/palette/PaletteGallery";
 import PalettePreview from "../components/palette/PalettePreview";
+import SavePaletteDialog from "../components/palette/SavePaletteDialog";
 import { useTheme } from "../context/useTheme";
 import { palettes } from "../data/palettes";
 import { createPaletteShareUrl } from "../utils/createPaletteShareUrl";
+import { savePaletteSnapshot } from "../utils/savedPalettes";
 
 export default function HomePage() {
   const { palette, selectPalette, updatePalette, resetPalette } = useTheme();
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
 
   const displayPalettes = palettes.map((item) =>
     item.id === palette.id ? palette : item,
@@ -29,6 +40,22 @@ export default function HomePage() {
         description:
           "Clipboard access was blocked. Try using ColorForge in a secure browser context.",
       });
+    }
+  }
+
+  function handleSavePalette(name: string) {
+    try {
+      savePaletteSnapshot(palette, name);
+      setIsSaveDialogOpen(false);
+
+      toast.success("Palette saved", {
+        description: `"${name.trim()}" is saved in this browser.`,
+        icon: <Check size={16} />,
+      });
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Couldn't save this palette.",
+      );
     }
   }
 
@@ -69,6 +96,20 @@ export default function HomePage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setIsSaveDialogOpen(true)}
+                className="inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-medium transition hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2"
+                style={{
+                  borderColor: "var(--cf-border)",
+                  backgroundColor: "var(--cf-primary)",
+                  color: "var(--cf-primary-foreground)",
+                }}
+              >
+                <BookmarkPlus size={14} aria-hidden="true" />
+                Save palette
+              </button>
+
               <button
                 type="button"
                 onClick={handleSharePalette}
@@ -139,6 +180,7 @@ export default function HomePage() {
                     Fine-tune the colors behind your theme.
                   </p>
                 </div>
+
                 <div
                   className="hidden rounded-xl border p-2.5 sm:block"
                   style={{
@@ -172,6 +214,7 @@ export default function HomePage() {
                   See your current theme in context.
                 </p>
               </div>
+
               <ArrowUpRight
                 size={17}
                 style={{ color: "var(--cf-muted-foreground)" }}
@@ -194,6 +237,14 @@ export default function HomePage() {
           <span>Changes update your theme in real time.</span>
         </footer>
       </div>
+
+      {isSaveDialogOpen && (
+        <SavePaletteDialog
+          defaultName={palette.name}
+          onSave={handleSavePalette}
+          onClose={() => setIsSaveDialogOpen(false)}
+        />
+      )}
     </main>
   );
 }
