@@ -1,9 +1,11 @@
-import { ArrowUpRight, Palette, Sparkles } from "lucide-react";
+import { ArrowUpRight, Check, Link2, Palette, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 import PaletteEditor from "../components/palette/PaletteEditor";
 import PaletteGallery from "../components/palette/PaletteGallery";
 import PalettePreview from "../components/palette/PalettePreview";
-import { palettes } from "../data/palettes";
 import { useTheme } from "../context/useTheme";
+import { palettes } from "../data/palettes";
+import { createPaletteShareUrl } from "../utils/createPaletteShareUrl";
 
 export default function HomePage() {
   const { palette, selectPalette, updatePalette, resetPalette } = useTheme();
@@ -11,6 +13,24 @@ export default function HomePage() {
   const displayPalettes = palettes.map((item) =>
     item.id === palette.id ? palette : item,
   );
+
+  async function handleSharePalette() {
+    const shareUrl = createPaletteShareUrl(palette);
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+
+      toast.success("Share link copied", {
+        description: "Your customized palette is ready to share.",
+        icon: <Check size={16} />,
+      });
+    } catch {
+      toast.error("Couldn't copy the share link", {
+        description:
+          "Clipboard access was blocked. Try using ColorForge in a secure browser context.",
+      });
+    }
+  }
 
   return (
     <main
@@ -48,16 +68,32 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div
-              className="inline-flex w-fit items-center gap-2 rounded-full border px-3 py-2 text-xs font-medium"
-              style={{
-                borderColor: "var(--cf-border)",
-                backgroundColor: "var(--cf-secondary)",
-                color: "var(--cf-secondary-foreground)",
-              }}
-            >
-              <Sparkles size={14} style={{ color: "var(--cf-primary)" }} />
-              Live editing
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={handleSharePalette}
+                className="inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-medium transition hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2"
+                style={{
+                  borderColor: "var(--cf-border)",
+                  backgroundColor: "var(--cf-background)",
+                  color: "var(--cf-foreground)",
+                }}
+              >
+                <Link2 size={14} aria-hidden="true" />
+                Share palette
+              </button>
+
+              <div
+                className="inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-medium"
+                style={{
+                  borderColor: "var(--cf-border)",
+                  backgroundColor: "var(--cf-secondary)",
+                  color: "var(--cf-secondary-foreground)",
+                }}
+              >
+                <Sparkles size={14} style={{ color: "var(--cf-primary)" }} />
+                Live editing
+              </div>
             </div>
           </div>
         </header>

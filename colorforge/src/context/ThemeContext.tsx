@@ -26,7 +26,51 @@ function isValidTokens(value: unknown): value is ThemeTokens {
   );
 }
 
+function getPaletteFromUrl(): Palette | null {
+  try {
+    const hash = window.location.hash.slice(1);
+    const params = new URLSearchParams(hash);
+    const sharedValue = params.get("palette");
+
+    if (!sharedValue) {
+      return null;
+    }
+
+    const parsed: unknown = JSON.parse(sharedValue);
+
+    if (
+      !isRecord(parsed) ||
+      typeof parsed.id !== "string" ||
+      !isValidTokens(parsed.tokens)
+    ) {
+      return null;
+    }
+
+    const original = palettes.find((item) => item.id === parsed.id);
+
+    if (!original) {
+      return null;
+    }
+
+    return {
+      ...original,
+      tokens: {
+        ...original.tokens,
+        ...parsed.tokens,
+      },
+    };
+  } catch {
+    return null;
+  }
+}
+
 function getInitialPalette(): Palette {
+  const sharedPalette = getPaletteFromUrl();
+
+  if (sharedPalette) {
+    return sharedPalette;
+  }
+
   try {
     const savedPalette = localStorage.getItem(STORAGE_KEY);
 
@@ -48,7 +92,10 @@ function getInitialPalette(): Palette {
 
     return {
       ...original,
-      tokens: { ...original.tokens, ...parsed.tokens },
+      tokens: {
+        ...original.tokens,
+        ...parsed.tokens,
+      },
     };
   } catch {
     return palettes[0];
