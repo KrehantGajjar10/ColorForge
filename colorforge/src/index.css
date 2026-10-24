@@ -32,3 +32,16 @@ a {
     scroll-behavior: auto;
   }
 }
+
+#root [style*="var(--cf-"] {
+  transition:
+    background-color 280ms ease,
+    color 280ms ease,
+    border-color 280ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #root [style*="var(--cf-"] {
+    transition-duration: 0.01ms;
+  }
+}

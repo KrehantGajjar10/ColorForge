@@ -1,13 +1,27 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { palettes } from "../data/palettes";
 import type { Palette, ThemeTokens } from "../types";
-import { ThemeContext, createThemeVariables } from "./theme-context";
+import {
+  ThemeContext,
+  createThemeVariables,
+  type ColorMode,
+} from "./theme-context";
+
+function getInitialColorMode(): ColorMode {
+  try {
+    const stored = localStorage.getItem(MODE_STORAGE_KEY);
+    return stored === "dark" ? "dark" : "light";
+  } catch {
+    return "light";
+  }
+}
 
 interface ThemeProviderProps {
   children: ReactNode;
 }
 
 const STORAGE_KEY = "colorforge-palette";
+const MODE_STORAGE_KEY = "colorforge-color-mode";
 const TOKEN_KEYS = Object.keys(palettes[0].tokens) as (keyof ThemeTokens)[];
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -104,6 +118,7 @@ function getInitialPalette(): Palette {
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const [palette, setPalette] = useState<Palette>(getInitialPalette);
+  const [colorMode, setColorMode] = useState<ColorMode>(getInitialColorMode);
 
   useEffect(() => {
     try {
@@ -112,6 +127,21 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       // Keep the editor usable if storage is unavailable.
     }
   }, [palette]);
+
+  useEffect(() => {
+    document.documentElement.style.colorScheme = colorMode;
+    document.documentElement.dataset.colorMode = colorMode;
+
+    try {
+      localStorage.setItem(MODE_STORAGE_KEY, colorMode);
+    } catch {
+      // Keep the theme switch usable if storage is unavailable.
+    }
+  }, [colorMode]);
+
+  function toggleColorMode() {
+    setColorMode((current) => (current === "light" ? "dark" : "light"));
+  }
 
   function selectPalette(nextPalette: Palette) {
     setPalette(nextPalette);
@@ -151,6 +181,8 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     <ThemeContext.Provider
       value={{
         palette,
+        colorMode,
+        toggleColorMode,
         selectPalette,
         selectPaletteById,
         updatePalette,
@@ -160,7 +192,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     >
       <div
         className="min-h-screen transition-colors duration-300"
-        style={createThemeVariables(palette.tokens)}
+        style={createThemeVariables(palette.tokens, colorMode)}
       >
         {children}
       </div>

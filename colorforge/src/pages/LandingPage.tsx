@@ -4,8 +4,10 @@ import {
   Check,
   ExternalLink,
   Layers3,
+  Moon,
   Palette,
   Sparkles,
+  Sun,
   WandSparkles,
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -92,7 +94,7 @@ function ThemeStrip({ reverse = false }: { reverse?: boolean }) {
 }
 
 export function LandingPage() {
-  const { palette } = useTheme();
+  const { palette, colorMode, toggleColorMode } = useTheme();
 
   return (
     <main
@@ -124,6 +126,25 @@ export function LandingPage() {
           </nav>
 
           <div className="cf-nav-actions">
+            <button
+              type="button"
+              className="cf-mode-toggle"
+              onClick={toggleColorMode}
+              aria-label={`Switch to ${colorMode === "light" ? "dark" : "light"} mode`}
+              aria-pressed={colorMode === "dark"}
+              title={`Switch to ${colorMode === "light" ? "Dark" : "Light"} mode`}
+            >
+              <span className="cf-mode-toggle-icon" aria-hidden="true">
+                {colorMode === "light" ? (
+                  <Moon size={18} strokeWidth={1.9} />
+                ) : (
+                  <Sun size={18} strokeWidth={1.9} />
+                )}
+              </span>
+              <span className="cf-mode-toggle-label">
+                {colorMode === "light" ? "Dark" : "Light"}
+              </span>
+            </button>
             <a
               className="cf-github-link"
               href="https://github.com/KrehantGajjar10/ColorForge"
