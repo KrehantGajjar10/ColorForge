@@ -183,7 +183,7 @@ export default function HomePage() {
         <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_340px] xl:gap-8">
           <div className="min-w-0 space-y-6">
             <section
-              className="min-w-0 rounded-2xl border p-4 sm:p-6"
+              className="min-w-0 rounded-2xl border p-4 transition-[background-color,border-color,box-shadow] duration-300 sm:p-6"
               style={{
                 borderColor: "var(--cf-border)",
                 backgroundColor: "var(--cf-secondary)",
@@ -197,7 +197,7 @@ export default function HomePage() {
             </section>
 
             <section
-              className="min-w-0 rounded-2xl border p-4 sm:p-6"
+              className="min-w-0 rounded-2xl border p-4 transition-[background-color,border-color,box-shadow] duration-300 sm:p-6"
               style={{
                 borderColor: "var(--cf-border)",
                 backgroundColor: "var(--cf-secondary)",
@@ -241,7 +241,7 @@ export default function HomePage() {
             </section>
 
             <section
-              className="min-w-0 rounded-2xl border p-4 sm:p-6"
+              className="min-w-0 rounded-2xl border p-4 transition-[background-color,border-color,box-shadow] duration-300 sm:p-6"
               style={{
                 borderColor: "var(--cf-border)",
                 backgroundColor: "var(--cf-secondary)",

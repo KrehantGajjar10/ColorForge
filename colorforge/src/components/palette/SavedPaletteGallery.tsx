@@ -81,7 +81,7 @@ export default function SavedPaletteGallery({
             return (
               <article
                 key={palette.id}
-                className="min-w-0 rounded-xl border p-3"
+                className="min-w-0 rounded-xl border p-3 transition-[background-color,border-color,box-shadow] duration-300 hover:shadow-sm"
                 style={{
                   borderColor: selected
                     ? "var(--cf-primary)"
@@ -134,7 +134,7 @@ export default function SavedPaletteGallery({
                   <button
                     type="button"
                     onClick={() => onLoad(palette)}
-                    className="flex-1 rounded-lg px-3 py-2 text-xs font-semibold transition hover:opacity-80"
+                    className="flex-1 rounded-lg px-3 py-2 text-xs font-semibold transition-opacity duration-200 hover:opacity-85 focus-visible:outline-2 focus-visible:outline-offset-2"
                     style={{
                       backgroundColor: "var(--cf-primary)",
                       color: "var(--cf-primary-foreground)",
@@ -148,7 +148,7 @@ export default function SavedPaletteGallery({
                     onClick={() => onDelete(palette)}
                     aria-label={`Delete ${palette.name}`}
                     title="Delete saved palette"
-                    className="rounded-lg border p-2 transition hover:opacity-70 focus-visible:outline-2"
+                    className="rounded-lg border p-2 transition-[background-color,color,border-color,opacity] duration-200 hover:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-2"
                     style={{
                       borderColor: "var(--cf-border)",
                       color: "var(--cf-muted-foreground)",
