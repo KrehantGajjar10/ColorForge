@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   BookmarkPlus,
   Check,
@@ -23,7 +24,27 @@ type EditorSection = "colors" | "saved";
 
 export default function HomePage() {
   const { palette, selectPalette, updatePalette, resetPalette } = useTheme();
-  const [activeSection, setActiveSection] = useState<EditorSection>("colors");
+  const location = useLocation();
+const navigate = useNavigate();
+
+const requestedTab = new URLSearchParams(location.search).get("tab");
+
+const activeSection: EditorSection =
+  requestedTab === "saved" ? "saved" : "colors";
+
+function handleSectionChange(section: EditorSection) {
+  const searchParams = new URLSearchParams(location.search);
+  searchParams.set("tab", section);
+
+  navigate(
+    {
+      pathname: location.pathname,
+      search: `?${searchParams.toString()}`,
+      hash: location.hash,
+    },
+    { replace: true },
+  );
+}
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [savedPalettes, setSavedPalettes] =
     useState<PaletteType[]>(getSavedPalettes);
@@ -67,7 +88,7 @@ export default function HomePage() {
 
   function handleLoadPalette(savedPalette: PaletteType) {
     selectPalette(savedPalette);
-    setActiveSection("colors");
+    handleSectionChange("colors");
     toast.success("Palette loaded", {
       description: `"${savedPalette.name}" is now active in the editor.`,
     });
@@ -155,7 +176,7 @@ export default function HomePage() {
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => setActiveSection(item.id)}
+                  onClick={() => handleSectionChange(item.id)}
                   aria-current={selected ? "page" : undefined}
                   className="flex min-w-0 items-center gap-3 rounded-xl border p-3 text-left transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2"
                   style={{
