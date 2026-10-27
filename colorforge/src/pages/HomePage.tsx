@@ -1,431 +1,424 @@
 import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import {
-  BookmarkPlus,
-  Check,
-  Layers3,
-  Link2,
-  Palette,
-  SlidersHorizontal,
+  ChevronDown,
+  ChevronRight,
+  Eye,
+  LayoutDashboard,
+  PanelsTopLeft,
+  Search,
+  Sparkles,
+  Type,
+  WandSparkles,
 } from "lucide-react";
-import { toast } from "sonner";
 import PaletteEditor from "../components/palette/PaletteEditor";
 import PaletteGallery from "../components/palette/PaletteGallery";
 import PalettePreview from "../components/palette/PalettePreview";
-import SavePaletteDialog from "../components/palette/SavePaletteDialog";
-import SavedPaletteGallery from "../components/palette/SavedPaletteGallery";
 import { useTheme } from "../context/useTheme";
 import { palettes } from "../data/palettes";
-import { createPaletteShareUrl } from "../utils/createPaletteShareUrl";
-import { getSavedPalettes, savePaletteSnapshot } from "../utils/savedPalettes";
-import type { Palette as PaletteType } from "../types";
 
-type EditorSection = "colors" | "saved";
+type SettingsTab = "colors" | "typography" | "other";
+type PreviewMode = "cards" | "dashboard" | "application" | "marketing";
+
+const settingTabs: {
+  id: SettingsTab;
+  label: string;
+  icon: typeof PanelsTopLeft;
+}[] = [
+  { id: "colors", label: "Colors", icon: PanelsTopLeft },
+  { id: "typography", label: "Typography", icon: Type },
+  { id: "other", label: "Other", icon: WandSparkles },
+];
+
+const previewModes: { id: PreviewMode; label: string }[] = [
+  { id: "cards", label: "Cards" },
+  { id: "dashboard", label: "Dashboard" },
+  { id: "application", label: "Application" },
+  { id: "marketing", label: "Marketing" },
+];
 
 export default function HomePage() {
   const { palette, selectPalette, updatePalette, resetPalette } = useTheme();
-  const location = useLocation();
-const navigate = useNavigate();
 
-const requestedTab = new URLSearchParams(location.search).get("tab");
-
-const activeSection: EditorSection =
-  requestedTab === "saved" ? "saved" : "colors";
-
-function handleSectionChange(section: EditorSection) {
-  const searchParams = new URLSearchParams(location.search);
-  searchParams.set("tab", section);
-
-  navigate(
-    {
-      pathname: location.pathname,
-      search: `?${searchParams.toString()}`,
-      hash: location.hash,
-    },
-    { replace: true },
-  );
-}
-  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
-  const [savedPalettes, setSavedPalettes] =
-    useState<PaletteType[]>(getSavedPalettes);
+  const [settingsTab, setSettingsTab] = useState<SettingsTab>("colors");
+  const [previewMode, setPreviewMode] = useState<PreviewMode>("cards");
+  const [search, setSearch] = useState("");
+  const [paletteListOpen, setPaletteListOpen] = useState(true);
 
   const displayPalettes = palettes.map((item) =>
     item.id === palette.id ? palette : item,
   );
 
-  async function handleSharePalette() {
-    const shareUrl = createPaletteShareUrl(palette);
-
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      toast.success("Share link copied", {
-        description: "Your customized palette is ready to share.",
-        icon: <Check size={16} />,
-      });
-    } catch {
-      toast.error("Couldn't copy the share link", {
-        description: "Clipboard access was blocked by your browser.",
-      });
-    }
-  }
-
-  function handleSavePalette(name: string) {
-    try {
-      savePaletteSnapshot(palette, name);
-      setSavedPalettes(getSavedPalettes());
-      setIsSaveDialogOpen(false);
-
-      toast.success("Palette saved", {
-        description: `"${name.trim()}" is saved in this browser.`,
-        icon: <Check size={16} />,
-      });
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Couldn't save this palette.",
-      );
-    }
-  }
-
-  function handleLoadPalette(savedPalette: PaletteType) {
-    selectPalette(savedPalette);
-    handleSectionChange("colors");
-    toast.success("Palette loaded", {
-      description: `"${savedPalette.name}" is now active in the editor.`,
-    });
-  }
-
-  function handleDeletePalette(savedPalette: PaletteType) {
-    const confirmed = window.confirm(
-      `Delete "${savedPalette.name}" from your saved palettes? This cannot be undone.`,
-    );
-
-    if (!confirmed) return;
-
-    try {
-      const remaining = getSavedPalettes().filter(
-        (item) => item.id !== savedPalette.id,
-      );
-
-      localStorage.setItem(
-        "colorforge-saved-palettes",
-        JSON.stringify(remaining),
-      );
-
-      setSavedPalettes(remaining);
-      toast.success("Saved palette deleted");
-    } catch {
-      toast.error("Couldn't delete this palette", {
-        description: "Your browser couldn't update saved palette storage.",
-      });
-    }
-  }
-
-  const navigationItems = [
-    {
-      id: "colors" as const,
-      label: "Colors",
-      description: "Palette and color tokens",
-      icon: Palette,
-    },
-    {
-      id: "saved" as const,
-      label: "Saved palettes",
-      description: "Your personal collection",
-      icon: BookmarkPlus,
-    },
-  ];
+  const filteredPalettes = displayPalettes.filter((item) =>
+    item.name.toLowerCase().includes(search.toLowerCase()),
+  );
 
   return (
     <main
-      className="min-h-[calc(100vh-4rem)] transition-colors duration-300"
+      className="flex min-h-[calc(100dvh-3.5rem)] flex-col overflow-hidden lg:flex-row"
       style={{
         backgroundColor: "var(--cf-background)",
         color: "var(--cf-foreground)",
       }}
     >
-      <div className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-[1800px] lg:grid-cols-[270px_minmax(0,1fr)]">
-        <aside
-          className="border-b p-4 sm:p-5 lg:border-r lg:border-b-0"
+      <aside
+        className="flex w-full shrink-0 flex-col border-b lg:h-[calc(100dvh-3.5rem)] lg:w-90 lg:border-b-0 lg:border-r xl:w-100"
+        style={{
+          borderColor: "var(--cf-border)",
+          backgroundColor: "var(--cf-background)",
+        }}
+        aria-label="Theme settings"
+      >
+        <div
+          className="grid grid-cols-3 gap-1 border-b p-2.5"
           style={{ borderColor: "var(--cf-border)" }}
-          aria-label="Theme editor settings"
+          role="tablist"
+          aria-label="Theme settings sections"
         >
-          <div className="mb-5">
-            <p
-              className="text-[11px] font-semibold uppercase tracking-[0.16em]"
-              style={{ color: "var(--cf-muted-foreground)" }}
-            >
-              Workspace
-            </p>
-            <h2 className="mt-2 text-lg font-semibold tracking-tight">
-              Theme settings
-            </h2>
-            <p
-              className="mt-1 text-sm leading-5"
-              style={{ color: "var(--cf-muted-foreground)" }}
-            >
-              Customize the design system for your interface.
-            </p>
-          </div>
+          {settingTabs.map((tab) => {
+            const Icon = tab.icon;
+            const active = settingsTab === tab.id;
 
-          <nav className="grid grid-cols-2 gap-2 lg:grid-cols-1">
-            {navigationItems.map((item) => {
-              const Icon = item.icon;
-              const selected = activeSection === item.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => setSettingsTab(tab.id)}
+                className="flex h-10 items-center justify-center gap-2 rounded-lg px-2 text-xs font-medium transition-colors"
+                style={{
+                  backgroundColor: active ? "var(--cf-primary)" : "transparent",
+                  color: active
+                    ? "var(--cf-primary-foreground)"
+                    : "var(--cf-muted-foreground)",
+                }}
+              >
+                <Icon size={15} aria-hidden="true" />
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
 
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => handleSectionChange(item.id)}
-                  aria-current={selected ? "page" : undefined}
-                  className="flex min-w-0 items-center gap-3 rounded-xl border p-3 text-left transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2"
+        <div className="min-h-0 flex-1 overflow-y-auto p-3 sm:p-4">
+          {settingsTab === "colors" && (
+            <div className="space-y-5">
+              <section>
+                <div className="mb-3 flex items-center justify-between gap-2">
+                  <div>
+                    <h2 className="text-sm font-semibold">Color system</h2>
+                    <p
+                      className="mt-1 text-xs"
+                      style={{ color: "var(--cf-muted-foreground)" }}
+                    >
+                      Customize your theme tokens.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={resetPalette}
+                    className="rounded-md px-2 py-1.5 text-xs transition-opacity hover:opacity-70"
+                    style={{ color: "var(--cf-muted-foreground)" }}
+                  >
+                    Reset
+                  </button>
+                </div>
+
+                <div
+                  className="mb-4 flex items-center gap-2 rounded-lg border px-3 py-2"
                   style={{
-                    borderColor: selected
-                      ? "var(--cf-primary)"
-                      : "var(--cf-border)",
-                    backgroundColor: selected
-                      ? "var(--cf-muted)"
-                      : "transparent",
+                    borderColor: "var(--cf-border)",
+                    backgroundColor: "var(--cf-secondary)",
                   }}
                 >
                   <span
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
-                    style={{
-                      backgroundColor: selected
-                        ? "var(--cf-primary)"
-                        : "var(--cf-secondary)",
-                      color: selected
-                        ? "var(--cf-primary-foreground)"
-                        : "var(--cf-foreground)",
-                    }}
+                    className="h-3 w-3 shrink-0 rounded-full"
+                    style={{ backgroundColor: "var(--cf-primary)" }}
+                  />
+                  <span className="min-w-0 flex-1 truncate text-xs font-medium">
+                    {palette.name}
+                  </span>
+                  <span
+                    className="text-[10px]"
+                    style={{ color: "var(--cf-muted-foreground)" }}
                   >
-                    <Icon size={17} aria-hidden="true" />
+                    Active
                   </span>
+                </div>
 
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm font-medium">
-                      {item.label}
-                    </span>
-                    <span
-                      className="mt-0.5 hidden text-xs lg:block"
-                      style={{ color: "var(--cf-muted-foreground)" }}
-                    >
-                      {item.description}
-                    </span>
-                  </span>
+                <label
+                  className="mb-4 flex h-10 items-center gap-2 rounded-lg border px-3"
+                  style={{ borderColor: "var(--cf-border)" }}
+                >
+                  <Search
+                    size={15}
+                    aria-hidden="true"
+                    style={{ color: "var(--cf-muted-foreground)" }}
+                  />
+                  <input
+                    value={search}
+                    onChange={(event) => setSearch(event.target.value)}
+                    placeholder="Search palettes..."
+                    className="min-w-0 flex-1 bg-transparent text-xs outline-none placeholder:opacity-60"
+                    aria-label="Search palettes"
+                  />
+                </label>
+
+                <button
+                  type="button"
+                  onClick={() => setPaletteListOpen((open) => !open)}
+                  aria-expanded={paletteListOpen}
+                  className="mb-3 flex w-full items-center justify-between rounded-md px-2 py-2 text-left text-[10px] font-semibold uppercase tracking-[0.12em]"
+                  style={{
+                    backgroundColor: "var(--cf-muted)",
+                    color: "var(--cf-muted-foreground)",
+                  }}
+                >
+                  <span>Theme palettes</span>
+                  {paletteListOpen ? (
+                    <ChevronDown size={14} aria-hidden="true" />
+                  ) : (
+                    <ChevronRight size={14} aria-hidden="true" />
+                  )}
+                </button>
+
+                {paletteListOpen && (
+                  <PaletteGallery
+                    palettes={filteredPalettes}
+                    selectedId={palette.id}
+                    onSelect={selectPalette}
+                  />
+                )}
+              </section>
+
+              <div
+                className="border-t pt-5"
+                style={{ borderColor: "var(--cf-border)" }}
+              >
+                <PaletteEditor
+                  palette={palette}
+                  onChange={updatePalette}
+                  onReset={resetPalette}
+                />
+              </div>
+            </div>
+          )}
+
+          {settingsTab === "typography" && (
+            <section className="space-y-4">
+              <div>
+                <h2 className="text-sm font-semibold">Typography</h2>
+                <p
+                  className="mt-1 text-xs leading-5"
+                  style={{ color: "var(--cf-muted-foreground)" }}
+                >
+                  Font controls and type-scale customization will be added in
+                  Chapter 17.
+                </p>
+              </div>
+
+              <div
+                className="rounded-xl border p-4"
+                style={{
+                  borderColor: "var(--cf-border)",
+                  backgroundColor: "var(--cf-secondary)",
+                }}
+              >
+                <span
+                  className="text-[10px] font-semibold uppercase tracking-wider"
+                  style={{ color: "var(--cf-muted-foreground)" }}
+                >
+                  Preview
+                </span>
+                <p className="mt-4 text-3xl font-semibold tracking-tight">
+                  Aa Bb Cc
+                </p>
+                <p
+                  className="mt-2 text-sm"
+                  style={{ color: "var(--cf-muted-foreground)" }}
+                >
+                  The quick brown fox jumps over the lazy dog.
+                </p>
+              </div>
+            </section>
+          )}
+
+          {settingsTab === "other" && (
+            <section className="space-y-4">
+              <div>
+                <h2 className="text-sm font-semibold">Other settings</h2>
+                <p
+                  className="mt-1 text-xs leading-5"
+                  style={{ color: "var(--cf-muted-foreground)" }}
+                >
+                  Radius and additional design settings will be introduced in
+                  Chapter 18.
+                </p>
+              </div>
+
+              <div
+                className="rounded-xl border p-4"
+                style={{
+                  borderColor: "var(--cf-border)",
+                  backgroundColor: "var(--cf-secondary)",
+                }}
+              >
+                <Sparkles
+                  size={18}
+                  style={{ color: "var(--cf-primary)" }}
+                  aria-hidden="true"
+                />
+                <p className="mt-3 text-sm font-medium">More theme controls</p>
+                <p
+                  className="mt-1 text-xs leading-5"
+                  style={{ color: "var(--cf-muted-foreground)" }}
+                >
+                  This panel is reserved for the next settings chapter.
+                </p>
+              </div>
+            </section>
+          )}
+        </div>
+
+        <div
+          className="hidden items-center justify-between border-t px-4 py-3 text-[11px] lg:flex"
+          style={{
+            borderColor: "var(--cf-border)",
+            color: "var(--cf-muted-foreground)",
+          }}
+        >
+          <span>ColorForge Theme Editor</span>
+          <span>Chapter 15</span>
+        </div>
+      </aside>
+
+      <section className="flex min-h-140 min-w-0 flex-1 flex-col lg:h-[calc(100dvh-3.5rem)]">
+        <div
+          className="flex min-h-14 items-center justify-between gap-3 overflow-x-auto border-b px-3 sm:px-5"
+          style={{ borderColor: "var(--cf-border)" }}
+        >
+          <nav
+            className="flex min-w-0 items-center gap-1"
+            aria-label="Preview modes"
+          >
+            {previewModes.map((mode) => {
+              const active = previewMode === mode.id;
+
+              return (
+                <button
+                  key={mode.id}
+                  type="button"
+                  onClick={() => setPreviewMode(mode.id)}
+                  aria-pressed={active}
+                  className="shrink-0 rounded-lg px-3 py-2 text-xs font-medium transition-colors"
+                  style={{
+                    backgroundColor: active
+                      ? "var(--cf-primary)"
+                      : "transparent",
+                    color: active
+                      ? "var(--cf-primary-foreground)"
+                      : "var(--cf-muted-foreground)",
+                  }}
+                >
+                  {mode.label}
                 </button>
               );
             })}
           </nav>
 
           <div
-            className="mt-5 hidden rounded-xl border p-3 lg:block"
-            style={{
-              borderColor: "var(--cf-border)",
-              backgroundColor: "var(--cf-secondary)",
-            }}
+            className="hidden shrink-0 items-center gap-2 text-xs md:flex"
+            style={{ color: "var(--cf-muted-foreground)" }}
           >
-            <div className="flex items-center gap-2">
-              <span
-                className="h-2 w-2 rounded-full"
-                style={{ backgroundColor: "var(--cf-primary)" }}
-              />
-              <span className="text-xs font-medium">Active theme</span>
-            </div>
-            <p className="mt-2 truncate text-sm font-semibold">
-              {palette.name}
-            </p>
-            <p
-              className="mt-1 text-xs"
-              style={{ color: "var(--cf-muted-foreground)" }}
-            >
-              Changes are saved in this browser automatically.
-            </p>
+            <Eye size={14} aria-hidden="true" />
+            Live preview
           </div>
-        </aside>
+        </div>
 
-        <section className="min-w-0 p-4 sm:p-6 lg:p-8">
-          <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
-            <div>
-              <div
-                className="mb-2 flex items-center gap-2 text-xs"
-                style={{ color: "var(--cf-muted-foreground)" }}
-              >
-                <Layers3 size={14} aria-hidden="true" />
-                <span>Theme editor</span>
-                <span>/</span>
-                <span>
-                  {activeSection === "colors" ? "Colors" : "Saved palettes"}
-                </span>
+        <div
+          className="min-h-0 flex-1 overflow-auto p-3 sm:p-5 lg:p-6"
+          style={{ backgroundColor: "var(--cf-secondary)" }}
+        >
+          <div className="mx-auto max-w-350">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h2 className="text-sm font-semibold">
+                  {previewModes.find((mode) => mode.id === previewMode)?.label}
+                </h2>
+                <p
+                  className="mt-1 text-xs"
+                  style={{ color: "var(--cf-muted-foreground)" }}
+                >
+                  Preview using {palette.name}
+                </p>
               </div>
 
-              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                {activeSection === "colors"
-                  ? "Customize your theme"
-                  : "Your saved palettes"}
-              </h2>
-
-              <p
-                className="mt-2 max-w-2xl text-sm leading-6"
-                style={{ color: "var(--cf-muted-foreground)" }}
-              >
-                {activeSection === "colors"
-                  ? "Choose a palette, adjust its semantic colors, and see your changes live."
-                  : "Load a saved palette or manage your personal collection."}
-              </p>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setIsSaveDialogOpen(true)}
-                className="inline-flex items-center gap-2 rounded-lg border px-3 py-2.5 text-sm font-medium transition-opacity hover:opacity-80"
+              <div
+                className="flex items-center gap-2 rounded-full border px-2.5 py-1.5 text-[10px]"
                 style={{
                   borderColor: "var(--cf-border)",
-                  backgroundColor: "var(--cf-secondary)",
+                  backgroundColor: "var(--cf-background)",
+                  color: "var(--cf-muted-foreground)",
                 }}
               >
-                <BookmarkPlus size={15} aria-hidden="true" />
-                <span className="hidden sm:inline">Save palette</span>
-                <span className="sm:hidden">Save</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleSharePalette}
-                className="inline-flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold transition-opacity hover:opacity-85"
-                style={{
-                  backgroundColor: "var(--cf-primary)",
-                  color: "var(--cf-primary-foreground)",
-                }}
-              >
-                <Link2 size={15} aria-hidden="true" />
-                Share
-              </button>
-            </div>
-          </div>
-
-          {activeSection === "colors" ? (
-            <div className="grid min-w-0 items-start gap-5 2xl:grid-cols-[minmax(0,1fr)_minmax(300px,0.85fr)]">
-              <div className="min-w-0 space-y-5">
-                <section
-                  className="min-w-0 rounded-2xl border p-4 sm:p-5"
-                  style={{
-                    borderColor: "var(--cf-border)",
-                    backgroundColor: "var(--cf-secondary)",
-                  }}
-                >
-                  <PaletteGallery
-                    palettes={displayPalettes}
-                    selectedId={palette.id}
-                    onSelect={selectPalette}
-                  />
-                </section>
-
-                <section
-                  className="min-w-0 rounded-2xl border p-4 sm:p-5"
-                  style={{
-                    borderColor: "var(--cf-border)",
-                    backgroundColor: "var(--cf-secondary)",
-                  }}
-                >
-                  <div className="mb-5 flex items-center gap-3">
-                    <span
-                      className="flex h-9 w-9 items-center justify-center rounded-lg"
-                      style={{
-                        backgroundColor: "var(--cf-muted)",
-                        color: "var(--cf-primary)",
-                      }}
-                    >
-                      <SlidersHorizontal size={17} aria-hidden="true" />
-                    </span>
-                    <div>
-                      <h3 className="text-sm font-semibold">
-                        Semantic color tokens
-                      </h3>
-                      <p
-                        className="mt-1 text-xs"
-                        style={{ color: "var(--cf-muted-foreground)" }}
-                      >
-                        Fine-tune each color used by your theme.
-                      </p>
-                    </div>
-                  </div>
-
-                  <PaletteEditor
-                    palette={palette}
-                    onChange={updatePalette}
-                    onReset={resetPalette}
-                  />
-                </section>
+                <span
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{ backgroundColor: "var(--cf-primary)" }}
+                />
+                Theme connected
               </div>
-
-              <aside
-                className="min-w-0 2xl:sticky 2xl:top-24"
-                aria-label="Live theme preview"
-              >
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <div>
-                    <h3 className="text-sm font-semibold">Live preview</h3>
-                    <p
-                      className="mt-1 text-xs"
-                      style={{ color: "var(--cf-muted-foreground)" }}
-                    >
-                      Updates as you edit your colors.
-                    </p>
-                  </div>
-
-                  <span
-                    className="rounded-full border px-2.5 py-1 text-xs"
-                    style={{
-                      borderColor: "var(--cf-border)",
-                      backgroundColor: "var(--cf-secondary)",
-                    }}
-                  >
-                    Live
-                  </span>
-                </div>
-
-                <PalettePreview palette={palette} />
-              </aside>
             </div>
-          ) : (
-            <section
-              className="min-w-0 rounded-2xl border p-4 sm:p-6"
+
+            <div
+              className="min-h-120 rounded-xl border p-3 sm:p-5"
               style={{
                 borderColor: "var(--cf-border)",
-                backgroundColor: "var(--cf-secondary)",
+                backgroundColor: "var(--cf-background)",
               }}
             >
-              <SavedPaletteGallery
-                palettes={savedPalettes}
-                selectedId={palette.id}
-                onLoad={handleLoadPalette}
-                onDelete={handleDeletePalette}
-              />
-            </section>
-          )}
+              {previewMode === "cards" ? (
+                <PalettePreview palette={palette} />
+              ) : (
+                <div className="flex min-h-107.5 flex-col items-center justify-center px-5 py-12 text-center">
+                  <span
+                    className="flex h-12 w-12 items-center justify-center rounded-xl"
+                    style={{
+                      backgroundColor: "var(--cf-muted)",
+                      color: "var(--cf-primary)",
+                    }}
+                  >
+                    {previewMode === "dashboard" ? (
+                      <LayoutDashboard size={22} aria-hidden="true" />
+                    ) : previewMode === "application" ? (
+                      <PanelsTopLeft size={22} aria-hidden="true" />
+                    ) : (
+                      <Sparkles size={22} aria-hidden="true" />
+                    )}
+                  </span>
 
-          <footer
-            className="mt-8 flex flex-wrap items-center justify-between gap-2 border-t pt-4 text-xs"
-            style={{
-              borderColor: "var(--cf-border)",
-              color: "var(--cf-muted-foreground)",
-            }}
-          >
-            <span>ColorForge · Theme workspace</span>
-            <span>Palette changes sync automatically.</span>
-          </footer>
-        </section>
-      </div>
+                  <h3 className="mt-4 text-lg font-semibold">
+                    {previewMode === "dashboard"
+                      ? "Dashboard preview"
+                      : previewMode === "application"
+                        ? "Application preview"
+                        : "Marketing preview"}
+                  </h3>
 
-      {isSaveDialogOpen && (
-        <SavePaletteDialog
-          defaultName={palette.name}
-          onSave={handleSavePalette}
-          onClose={() => setIsSaveDialogOpen(false)}
-        />
-      )}
+                  <p
+                    className="mt-2 max-w-sm text-sm leading-6"
+                    style={{ color: "var(--cf-muted-foreground)" }}
+                  >
+                    This preview will become a fully styled, theme-aware
+                    interface in a later chapter. Your selected palette is
+                    already connected to the editor.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
