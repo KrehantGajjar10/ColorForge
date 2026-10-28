@@ -2,10 +2,12 @@ import { useMemo, useState } from "react";
 import {
   ChevronDown,
   ChevronRight,
+  Copy,
   RotateCcw,
   Search,
   SlidersHorizontal,
 } from "lucide-react";
+import { toast } from "sonner";
 import type { Palette, ThemeTokens } from "../../types";
 import { themeTokenDefinitions } from "../../data/themeTokens";
 
@@ -127,6 +129,19 @@ export default function PaletteEditor({
       delete next[key];
       return next;
     });
+  }
+
+  async function copyColor(key: TokenKey, label: string) {
+    try {
+      await navigator.clipboard.writeText(palette.tokens[key]);
+      toast.success(`${label} copied`, {
+        description: palette.tokens[key].toUpperCase(),
+      });
+    } catch {
+      toast.error("Couldn't copy color", {
+        description: "Clipboard access was blocked by your browser.",
+      });
+    }
   }
 
   function toggleGroup(groupId: string) {
@@ -260,7 +275,7 @@ export default function PaletteEditor({
                     return (
                       <div
                         key={token.key}
-                        className="flex min-w-0 items-center gap-2.5 px-3 py-3"
+                        className="flex min-w-0 items-center gap-2 px-3 py-3"
                         style={{
                           borderTop: index
                             ? "1px solid var(--cf-border)"
@@ -314,7 +329,7 @@ export default function PaletteEditor({
                           autoComplete="off"
                           aria-label={`${token.label} hex value`}
                           aria-invalid={invalidHex}
-                          className="w-22 shrink-0 rounded-md border px-2 py-2 font-mono text-[11px] uppercase outline-none focus-visible:ring-1"
+                          className="w-20 shrink-0 rounded-md border px-2 py-2 font-mono text-[11px] uppercase outline-none focus-visible:ring-1"
                           style={{
                             borderColor: invalidHex
                               ? "#dc2626"
@@ -323,6 +338,21 @@ export default function PaletteEditor({
                             color: "var(--cf-foreground)",
                           }}
                         />
+
+                        <button
+                          type="button"
+                          onClick={() => copyColor(token.key, token.label)}
+                          aria-label={`Copy ${token.label} hex value`}
+                          title={`Copy ${token.label} hex value`}
+                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border transition-colors hover:opacity-70"
+                          style={{
+                            borderColor: "var(--cf-border)",
+                            backgroundColor: "var(--cf-background)",
+                            color: "var(--cf-muted-foreground)",
+                          }}
+                        >
+                          <Copy size={13} aria-hidden="true" />
+                        </button>
                       </div>
                     );
                   })}
