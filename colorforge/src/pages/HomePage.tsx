@@ -36,6 +36,33 @@ const previewModes: { id: PreviewMode; label: string }[] = [
   { id: "marketing", label: "Marketing" },
 ];
 
+const fontFamilies = [
+  {
+    label: "Inter",
+    value: "Inter, ui-sans-serif, system-ui, sans-serif",
+  },
+  {
+    label: "Geist",
+    value: "Geist, ui-sans-serif, system-ui, sans-serif",
+  },
+  {
+    label: "System",
+    value: "ui-sans-serif, system-ui, sans-serif",
+  },
+  {
+    label: "Arial",
+    value: "Arial, Helvetica, sans-serif",
+  },
+  {
+    label: "Georgia",
+    value: "Georgia, serif",
+  },
+  {
+    label: "Monospace",
+    value: "ui-monospace, SFMono-Regular, Consolas, monospace",
+  },
+];
+
 export default function HomePage() {
   const { palette, selectPalette, updatePalette, resetPalette } = useTheme();
 
@@ -43,6 +70,7 @@ export default function HomePage() {
   const [previewMode, setPreviewMode] = useState<PreviewMode>("cards");
   const [search, setSearch] = useState("");
   const [paletteListOpen, setPaletteListOpen] = useState(true);
+  const [fontFamily, setFontFamily] = useState(fontFamilies[0].value);
 
   const displayPalettes = palettes.map((item) =>
     item.id === palette.id ? palette : item,
@@ -213,8 +241,42 @@ export default function HomePage() {
                   className="mt-1 text-xs leading-5"
                   style={{ color: "var(--cf-muted-foreground)" }}
                 >
-                  Font controls and type-scale customization will be added in
-                  Chapter 17.
+                  Choose a font family and preview how it looks with your theme.
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  htmlFor="font-family"
+                  className="block text-xs font-medium"
+                >
+                  Font family
+                </label>
+
+                <select
+                  id="font-family"
+                  value={fontFamily}
+                  onChange={(event) => setFontFamily(event.target.value)}
+                  className="h-10 w-full rounded-lg border px-3 text-sm outline-none focus-visible:ring-1"
+                  style={{
+                    borderColor: "var(--cf-border)",
+                    backgroundColor: "var(--cf-background)",
+                    color: "var(--cf-foreground)",
+                  }}
+                >
+                  {fontFamilies.map((font) => (
+                    <option key={font.label} value={font.value}>
+                      {font.label}
+                    </option>
+                  ))}
+                </select>
+
+                <p
+                  className="text-[11px] leading-5"
+                  style={{ color: "var(--cf-muted-foreground)" }}
+                >
+                  Some fonts may fall back to a system font if they are not
+                  installed.
                 </p>
               </div>
 
@@ -223,23 +285,36 @@ export default function HomePage() {
                 style={{
                   borderColor: "var(--cf-border)",
                   backgroundColor: "var(--cf-secondary)",
+                  fontFamily,
                 }}
               >
                 <span
                   className="text-[10px] font-semibold uppercase tracking-wider"
                   style={{ color: "var(--cf-muted-foreground)" }}
                 >
-                  Preview
+                  Typography preview
                 </span>
+
                 <p className="mt-4 text-3xl font-semibold tracking-tight">
                   Aa Bb Cc
                 </p>
-                <p
-                  className="mt-2 text-sm"
-                  style={{ color: "var(--cf-muted-foreground)" }}
-                >
+
+                <p className="mt-2 text-sm leading-6">
                   The quick brown fox jumps over the lazy dog.
                 </p>
+
+                <div
+                  className="mt-4 border-t pt-3"
+                  style={{ borderColor: "var(--cf-border)" }}
+                >
+                  <p className="text-lg font-medium">Heading example</p>
+                  <p
+                    className="mt-1 text-sm"
+                    style={{ color: "var(--cf-muted-foreground)" }}
+                  >
+                    Body text example for your selected theme.
+                  </p>
+                </div>
               </div>
             </section>
           )}
