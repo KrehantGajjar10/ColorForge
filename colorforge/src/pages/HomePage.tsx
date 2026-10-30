@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   ChevronDown,
   ChevronRight,
@@ -14,6 +14,7 @@ import PaletteEditor from "../components/palette/PaletteEditor";
 import PaletteGallery from "../components/palette/PaletteGallery";
 import PalettePreview from "../components/palette/PalettePreview";
 import { useTheme } from "../context/useTheme";
+import { fontFamilies, type FontFamily } from "../context/theme-context";
 import { palettes } from "../data/palettes";
 
 type SettingsTab = "colors" | "typography" | "other";
@@ -36,65 +37,20 @@ const previewModes: { id: PreviewMode; label: string }[] = [
   { id: "marketing", label: "Marketing" },
 ];
 
-const fontFamilies = [
-  {
-    label: "Inter",
-    value: "Inter, ui-sans-serif, system-ui, sans-serif",
-  },
-  {
-    label: "Geist",
-    value: "Geist, ui-sans-serif, system-ui, sans-serif",
-  },
-  {
-    label: "System",
-    value: "ui-sans-serif, system-ui, sans-serif",
-  },
-  {
-    label: "Arial",
-    value: "Arial, Helvetica, sans-serif",
-  },
-  {
-    label: "Georgia",
-    value: "Georgia, serif",
-  },
-  {
-    label: "Monospace",
-    value: "ui-monospace, SFMono-Regular, Consolas, monospace",
-  },
-];
-
-const FONT_STORAGE_KEY = "colorforge-font-family";
-
-function getInitialFontFamily(): string {
-  try {
-    const savedFont = localStorage.getItem(FONT_STORAGE_KEY);
-
-    if (fontFamilies.some((font) => font.value === savedFont)) {
-      return savedFont!;
-    }
-  } catch {
-    // Use the default font when browser storage is unavailable.
-  }
-
-  return fontFamilies[0].value;
-}
-
 export default function HomePage() {
-  const { palette, selectPalette, updatePalette, resetPalette } = useTheme();
+  const {
+    palette,
+    selectPalette,
+    updatePalette,
+    resetPalette,
+    fontFamily,
+    setFontFamily,
+  } = useTheme();
 
   const [settingsTab, setSettingsTab] = useState<SettingsTab>("colors");
   const [previewMode, setPreviewMode] = useState<PreviewMode>("cards");
   const [search, setSearch] = useState("");
   const [paletteListOpen, setPaletteListOpen] = useState(true);
-  const [fontFamily, setFontFamily] = useState<string>(getInitialFontFamily);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(FONT_STORAGE_KEY, fontFamily);
-    } catch {
-      // Keep the selected font working for the current session.
-    }
-  }, [fontFamily]);
 
   const displayPalettes = palettes.map((item) =>
     item.id === palette.id ? palette : item,
@@ -110,7 +66,6 @@ export default function HomePage() {
       style={{
         backgroundColor: "var(--cf-background)",
         color: "var(--cf-foreground)",
-        fontFamily,
       }}
     >
       <aside
@@ -281,7 +236,9 @@ export default function HomePage() {
                 <select
                   id="font-family"
                   value={fontFamily}
-                  onChange={(event) => setFontFamily(event.target.value)}
+                  onChange={(event) =>
+                    setFontFamily(event.target.value as FontFamily)
+                  }
                   className="h-10 w-full rounded-lg border px-3 text-sm outline-none focus-visible:ring-1"
                   style={{
                     borderColor: "var(--cf-border)",
@@ -310,7 +267,6 @@ export default function HomePage() {
                 style={{
                   borderColor: "var(--cf-border)",
                   backgroundColor: "var(--cf-secondary)",
-                  fontFamily,
                 }}
               >
                 <span

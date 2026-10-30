@@ -4,8 +4,20 @@ import type { Palette, ThemeTokens } from "../types";
 import {
   ThemeContext,
   createThemeVariables,
+  fontFamilies,
   type ColorMode,
+  type FontFamily,
 } from "./theme-context";
+
+interface ThemeProviderProps {
+  children: ReactNode;
+}
+
+const STORAGE_KEY = "colorforge-palette";
+const MODE_STORAGE_KEY = "colorforge-color-mode";
+const FONT_STORAGE_KEY = "colorforge-font-family";
+
+const TOKEN_KEYS = Object.keys(palettes[0].tokens) as (keyof ThemeTokens)[];
 
 function getInitialColorMode(): ColorMode {
   try {
@@ -16,13 +28,21 @@ function getInitialColorMode(): ColorMode {
   }
 }
 
-interface ThemeProviderProps {
-  children: ReactNode;
-}
+function getInitialFontFamily(): FontFamily {
+  try {
+    const stored = localStorage.getItem(FONT_STORAGE_KEY);
 
-const STORAGE_KEY = "colorforge-palette";
-const MODE_STORAGE_KEY = "colorforge-color-mode";
-const TOKEN_KEYS = Object.keys(palettes[0].tokens) as (keyof ThemeTokens)[];
+    const savedFont = fontFamilies.find((font) => font.value === stored);
+
+    if (savedFont) {
+      return savedFont.value;
+    }
+  } catch {
+    // Use the default font when browser storage is unavailable.
+  }
+
+  return fontFamilies[0].value;
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -119,6 +139,8 @@ function getInitialPalette(): Palette {
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const [palette, setPalette] = useState<Palette>(getInitialPalette);
   const [colorMode, setColorMode] = useState<ColorMode>(getInitialColorMode);
+  const [fontFamily, setFontFamily] =
+    useState<FontFamily>(getInitialFontFamily);
 
   useEffect(() => {
     try {
@@ -138,6 +160,14 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       // Keep the theme switch usable if storage is unavailable.
     }
   }, [colorMode]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(FONT_STORAGE_KEY, fontFamily);
+    } catch {
+      // Keep the selected font working for the current session.
+    }
+  }, [fontFamily]);
 
   function toggleColorMode() {
     setColorMode((current) => (current === "light" ? "dark" : "light"));
@@ -182,6 +212,8 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       value={{
         palette,
         colorMode,
+        fontFamily,
+        setFontFamily,
         toggleColorMode,
         selectPalette,
         selectPaletteById,
@@ -192,7 +224,10 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
     >
       <div
         className="min-h-screen transition-colors duration-300"
-        style={createThemeVariables(palette.tokens, colorMode)}
+        style={{
+          ...createThemeVariables(palette.tokens, colorMode),
+          fontFamily,
+        }}
       >
         {children}
       </div>

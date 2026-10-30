@@ -4,9 +4,40 @@ import type { Palette, ThemeTokens } from "../types";
 
 export type ColorMode = "light" | "dark";
 
+export const fontFamilies = [
+  {
+    label: "Inter",
+    value: "Inter, ui-sans-serif, system-ui, sans-serif",
+  },
+  {
+    label: "Geist",
+    value: "Geist, ui-sans-serif, system-ui, sans-serif",
+  },
+  {
+    label: "System",
+    value: "ui-sans-serif, system-ui, sans-serif",
+  },
+  {
+    label: "Arial",
+    value: "Arial, Helvetica, sans-serif",
+  },
+  {
+    label: "Georgia",
+    value: "Georgia, serif",
+  },
+  {
+    label: "Monospace",
+    value: "ui-monospace, SFMono-Regular, Consolas, monospace",
+  },
+] as const;
+
+export type FontFamily = (typeof fontFamilies)[number]["value"];
+
 export interface ThemeContextValue {
   palette: Palette;
   colorMode: ColorMode;
+  fontFamily: FontFamily;
+  setFontFamily: (fontFamily: FontFamily) => void;
   toggleColorMode: () => void;
   selectPalette: (palette: Palette) => void;
   selectPaletteById: (id: string) => void;
