@@ -1,54 +1,10 @@
 import { useMemo, useState } from "react";
-import {
-  ChevronDown,
-  ChevronRight,
-  Copy,
-  RotateCcw,
-  Search,
-  SlidersHorizontal,
-} from "lucide-react";
+import { RotateCcw, Search, SlidersHorizontal } from "lucide-react";
 import { toast } from "sonner";
-import type { Palette, ThemeTokens } from "../../types";
+import type { Palette } from "../../types";
 import { themeTokenDefinitions } from "../../data/themeTokens";
-
-type TokenKey = keyof ThemeTokens;
-
-const tokenGroups: {
-  id: string;
-  label: string;
-  keys: TokenKey[];
-}[] = [
-  {
-    id: "base",
-    label: "Base colors",
-    keys: ["background", "foreground"],
-  },
-  {
-    id: "primary",
-    label: "Primary colors",
-    keys: ["primary", "primaryForeground"],
-  },
-  {
-    id: "secondary",
-    label: "Secondary colors",
-    keys: ["secondary", "secondaryForeground"],
-  },
-  {
-    id: "accent",
-    label: "Accent colors",
-    keys: ["accent", "accentForeground"],
-  },
-  {
-    id: "muted",
-    label: "Muted colors",
-    keys: ["muted", "mutedForeground"],
-  },
-  {
-    id: "borders",
-    label: "Borders",
-    keys: ["border"],
-  },
-];
+import TokenGroup from "./palette-editor/TokenGroup";
+import { tokenGroups, type TokenKey } from "./palette-editor/tokenGroups";
 
 interface PaletteEditorProps {
   palette: Palette;
@@ -74,16 +30,10 @@ export default function PaletteEditor({
       .map((group) => ({
         ...group,
         tokens: group.keys
-          .map((key) => {
-            const definition = themeTokenDefinitions.find(
-              (item) => item.key === key,
-            );
-
-            return definition ? { ...definition, key } : null;
-          })
+          .map((key) => themeTokenDefinitions.find((item) => item.key === key))
           .filter(
-            (item): item is NonNullable<typeof item> =>
-              item !== null &&
+            (item): item is (typeof themeTokenDefinitions)[number] =>
+              item !== undefined &&
               (!query ||
                 item.label.toLowerCase().includes(query) ||
                 item.description.toLowerCase().includes(query) ||
@@ -221,146 +171,22 @@ export default function PaletteEditor({
       </label>
 
       <div className="space-y-2">
-        {filteredGroups.map((group) => {
-          const collapsed = !search && collapsedGroups.includes(group.id);
-
-          return (
-            <section
-              key={group.id}
-              className="overflow-hidden rounded-lg border"
-              style={{ borderColor: "var(--cf-border)" }}
-            >
-              <button
-                type="button"
-                onClick={() => toggleGroup(group.id)}
-                aria-expanded={!collapsed}
-                className="flex w-full items-center gap-2 px-3 py-2.5 text-left transition-colors hover:opacity-80"
-                style={{ backgroundColor: "var(--cf-secondary)" }}
-              >
-                {collapsed ? (
-                  <ChevronRight
-                    size={14}
-                    aria-hidden="true"
-                    style={{ color: "var(--cf-muted-foreground)" }}
-                  />
-                ) : (
-                  <ChevronDown
-                    size={14}
-                    aria-hidden="true"
-                    style={{ color: "var(--cf-muted-foreground)" }}
-                  />
-                )}
-
-                <span className="flex-1 text-xs font-medium">
-                  {group.label}
-                </span>
-
-                <span
-                  className="text-[10px] tabular-nums"
-                  style={{ color: "var(--cf-muted-foreground)" }}
-                >
-                  {group.tokens.length}
-                </span>
-              </button>
-
-              {!collapsed && (
-                <div>
-                  {group.tokens.map((token, index) => {
-                    const color = palette.tokens[token.key];
-                    const draft = hexValues[token.key];
-                    const validHex = /^#[0-9a-fA-F]{6}$/.test(draft ?? "");
-                    const invalidHex =
-                      draft !== undefined && draft.length > 0 && !validHex;
-
-                    return (
-                      <div
-                        key={token.key}
-                        className="flex min-w-0 items-center gap-2 px-3 py-3"
-                        style={{
-                          borderTop: index
-                            ? "1px solid var(--cf-border)"
-                            : undefined,
-                        }}
-                      >
-                        <label
-                          className="relative h-9 w-9 shrink-0 cursor-pointer overflow-hidden rounded-md border"
-                          style={{ borderColor: "var(--cf-border)" }}
-                          title={`Change ${token.label}`}
-                        >
-                          <span
-                            className="absolute inset-0"
-                            style={{ backgroundColor: color }}
-                          />
-                          <input
-                            type="color"
-                            value={color}
-                            onChange={(event) =>
-                              updateColor(token.key, event.target.value)
-                            }
-                            aria-label={`Choose ${token.label} color`}
-                            className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                          />
-                        </label>
-
-                        <div className="min-w-0 flex-1">
-                          <label
-                            htmlFor={`token-${token.key}`}
-                            className="block truncate text-xs font-medium"
-                          >
-                            {token.label}
-                          </label>
-                          <p
-                            className="mt-0.5 truncate text-[10px]"
-                            style={{ color: "var(--cf-muted-foreground)" }}
-                          >
-                            {token.description}
-                          </p>
-                        </div>
-
-                        <input
-                          id={`token-${token.key}`}
-                          value={draft ?? color}
-                          onChange={(event) =>
-                            updateHex(token.key, event.target.value)
-                          }
-                          onBlur={() => handleHexBlur(token.key)}
-                          maxLength={7}
-                          spellCheck={false}
-                          autoComplete="off"
-                          aria-label={`${token.label} hex value`}
-                          aria-invalid={invalidHex}
-                          className="w-20 shrink-0 rounded-md border px-2 py-2 font-mono text-[11px] uppercase outline-none focus-visible:ring-1"
-                          style={{
-                            borderColor: invalidHex
-                              ? "#dc2626"
-                              : "var(--cf-border)",
-                            backgroundColor: "var(--cf-background)",
-                            color: "var(--cf-foreground)",
-                          }}
-                        />
-
-                        <button
-                          type="button"
-                          onClick={() => copyColor(token.key, token.label)}
-                          aria-label={`Copy ${token.label} hex value`}
-                          title={`Copy ${token.label} hex value`}
-                          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border transition-colors hover:opacity-70"
-                          style={{
-                            borderColor: "var(--cf-border)",
-                            backgroundColor: "var(--cf-background)",
-                            color: "var(--cf-muted-foreground)",
-                          }}
-                        >
-                          <Copy size={13} aria-hidden="true" />
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </section>
-          );
-        })}
+        {filteredGroups.map((group) => (
+          <TokenGroup
+            key={group.id}
+            id={group.id}
+            label={group.label}
+            tokens={group.tokens}
+            values={palette.tokens}
+            collapsed={!search && collapsedGroups.includes(group.id)}
+            drafts={hexValues}
+            onToggle={toggleGroup}
+            onColorChange={updateColor}
+            onHexChange={updateHex}
+            onHexBlur={handleHexBlur}
+            onCopy={copyColor}
+          />
+        ))}
 
         {filteredGroups.length === 0 && (
           <div

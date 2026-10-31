@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { palettes } from "../data/palettes";
 import type { Palette, ThemeTokens } from "../types";
+import { isRecord, isValidThemeTokens } from "../utils/themeValidation";
 import {
   ThemeContext,
   createThemeVariables,
@@ -17,12 +18,9 @@ const STORAGE_KEY = "colorforge-palette";
 const MODE_STORAGE_KEY = "colorforge-color-mode";
 const FONT_STORAGE_KEY = "colorforge-font-family";
 
-const TOKEN_KEYS = Object.keys(palettes[0].tokens) as (keyof ThemeTokens)[];
-
 function getInitialColorMode(): ColorMode {
   try {
-    const stored = localStorage.getItem(MODE_STORAGE_KEY);
-    return stored === "dark" ? "dark" : "light";
+    return localStorage.getItem(MODE_STORAGE_KEY) === "dark" ? "dark" : "light";
   } catch {
     return "light";
   }
@@ -31,7 +29,6 @@ function getInitialColorMode(): ColorMode {
 function getInitialFontFamily(): FontFamily {
   try {
     const stored = localStorage.getItem(FONT_STORAGE_KEY);
-
     const savedFont = fontFamilies.find((font) => font.value === stored);
 
     if (savedFont) {
@@ -42,22 +39,6 @@ function getInitialFontFamily(): FontFamily {
   }
 
   return fontFamilies[0].value;
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function isValidTokens(value: unknown): value is ThemeTokens {
-  if (!isRecord(value)) {
-    return false;
-  }
-
-  return TOKEN_KEYS.every(
-    (key) =>
-      typeof value[key] === "string" &&
-      /^#[0-9a-fA-F]{6}$/.test(value[key] as string),
-  );
 }
 
 function getPaletteFromUrl(): Palette | null {
@@ -75,7 +56,7 @@ function getPaletteFromUrl(): Palette | null {
     if (
       !isRecord(parsed) ||
       typeof parsed.id !== "string" ||
-      !isValidTokens(parsed.tokens)
+      !isValidThemeTokens(parsed.tokens)
     ) {
       return null;
     }
@@ -106,21 +87,25 @@ function getInitialPalette(): Palette {
   }
 
   try {
-    const savedPalette = localStorage.getItem(STORAGE_KEY);
+    const stored = localStorage.getItem(STORAGE_KEY);
 
-    if (!savedPalette) {
+    if (!stored) {
       return palettes[0];
     }
 
-    const parsed: unknown = JSON.parse(savedPalette);
+    const parsed: unknown = JSON.parse(stored);
 
-    if (!isRecord(parsed) || typeof parsed.id !== "string") {
+    if (
+      !isRecord(parsed) ||
+      typeof parsed.id !== "string" ||
+      !isValidThemeTokens(parsed.tokens)
+    ) {
       return palettes[0];
     }
 
     const original = palettes.find((item) => item.id === parsed.id);
 
-    if (!original || !isValidTokens(parsed.tokens)) {
+    if (!original) {
       return palettes[0];
     }
 

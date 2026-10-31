@@ -1,54 +1,21 @@
-import type { Palette, ThemeTokens } from "../types";
+import type { Palette } from "../types";
+import { isValidPalette } from "./themeValidation";
 
 const STORAGE_KEY = "colorforge-saved-palettes";
-
-const TOKEN_KEYS: (keyof ThemeTokens)[] = [
-  "background",
-  "foreground",
-  "primary",
-  "primaryForeground",
-  "secondary",
-  "secondaryForeground",
-  "accent",
-  "accentForeground",
-  "muted",
-  "mutedForeground",
-  "border",
-];
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-function isValidTokens(value: unknown): value is ThemeTokens {
-  if (!isRecord(value)) return false;
-
-  return TOKEN_KEYS.every(
-    (key) =>
-      typeof value[key] === "string" &&
-      /^#[0-9a-fA-F]{6}$/.test(value[key] as string),
-  );
-}
-
-function isValidPalette(value: unknown): value is Palette {
-  return (
-    isRecord(value) &&
-    typeof value.id === "string" &&
-    typeof value.name === "string" &&
-    typeof value.description === "string" &&
-    isValidTokens(value.tokens)
-  );
-}
 
 export function getSavedPalettes(): Palette[] {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
 
-    if (!stored) return [];
+    if (!stored) {
+      return [];
+    }
 
     const parsed: unknown = JSON.parse(stored);
 
-    if (!Array.isArray(parsed)) return [];
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
 
     return parsed.filter(isValidPalette);
   } catch {
