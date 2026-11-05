@@ -1,9 +1,10 @@
-import { Eye, PanelsTopLeft, Sparkles } from "lucide-react";
+import { Eye, Sparkles } from "lucide-react";
 
 import PalettePreview from "../../../components/palette/PalettePreview";
 import type { Palette } from "../../../types";
 import { previewModes, type PreviewMode } from "../editor.types";
 import DashboardPreview from "./DashboardPreview";
+import ApplicationPreview from "./ApplicationPreview";
 
 interface PreviewWorkspaceProps {
   palette: Palette;
@@ -103,6 +104,8 @@ export default function PreviewWorkspace({
               <PalettePreview palette={palette} />
             ) : previewMode === "dashboard" ? (
               <DashboardPreview />
+            ) : previewMode === "application" ? (
+              <ApplicationPreview />
             ) : (
               <div className="flex min-h-107.5 flex-col items-center justify-center px-5 py-12 text-center">
                 <span
@@ -112,17 +115,11 @@ export default function PreviewWorkspace({
                     color: "var(--cf-primary)",
                   }}
                 >
-                  {previewMode === "application" ? (
-                    <PanelsTopLeft size={22} aria-hidden="true" />
-                  ) : (
-                    <Sparkles size={22} aria-hidden="true" />
-                  )}
+                  <Sparkles size={22} aria-hidden="true" />
                 </span>
 
                 <h3 className="mt-4 text-lg font-semibold">
-                  {previewMode === "application"
-                    ? "Application preview"
-                    : "Marketing preview"}
+                  Marketing preview
                 </h3>
 
                 <p
