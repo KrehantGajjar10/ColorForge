@@ -1,10 +1,11 @@
-import { Eye, Sparkles } from "lucide-react";
+import { Eye } from "lucide-react";
 
 import PalettePreview from "../../../components/palette/PalettePreview";
 import type { Palette } from "../../../types";
 import { previewModes, type PreviewMode } from "../editor.types";
 import DashboardPreview from "./DashboardPreview";
 import ApplicationPreview from "./ApplicationPreview";
+import MarketingPreview from "./MarketingPreview";
 
 interface PreviewWorkspaceProps {
   palette: Palette;
@@ -107,30 +108,7 @@ export default function PreviewWorkspace({
             ) : previewMode === "application" ? (
               <ApplicationPreview />
             ) : (
-              <div className="flex min-h-107.5 flex-col items-center justify-center px-5 py-12 text-center">
-                <span
-                  className="flex h-12 w-12 items-center justify-center rounded-xl"
-                  style={{
-                    backgroundColor: "var(--cf-muted)",
-                    color: "var(--cf-primary)",
-                  }}
-                >
-                  <Sparkles size={22} aria-hidden="true" />
-                </span>
-
-                <h3 className="mt-4 text-lg font-semibold">
-                  Marketing preview
-                </h3>
-
-                <p
-                  className="mt-2 max-w-sm text-sm leading-6"
-                  style={{ color: "var(--cf-muted-foreground)" }}
-                >
-                  This preview will become a fully styled, theme-aware interface
-                  in a later chapter. Your selected palette is already connected
-                  to the editor.
-                </p>
-              </div>
+              <MarketingPreview />
             )}
           </div>
         </div>
