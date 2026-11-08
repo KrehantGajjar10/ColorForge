@@ -1,6 +1,6 @@
 import { Eye } from "lucide-react";
 
-import PalettePreview from "../../../components/palette/PalettePreview";
+import CardsPreview from "./CardsPreview";
 import type { Palette } from "../../../types";
 import { previewModes, type PreviewMode } from "../editor.types";
 import DashboardPreview from "./DashboardPreview";
@@ -102,7 +102,7 @@ export default function PreviewWorkspace({
             }}
           >
             {previewMode === "cards" ? (
-              <PalettePreview palette={palette} />
+              <CardsPreview palette={palette} />
             ) : previewMode === "dashboard" ? (
               <DashboardPreview />
             ) : previewMode === "application" ? (
