@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 
 import type { Palette } from "../../../types";
+import AdvancedCardsPreview from "./AdvancedCardsPreview";
 
 interface CardsPreviewProps {
   palette: Palette;
@@ -519,6 +520,7 @@ export default function CardsPreview({ palette }: CardsPreviewProps) {
           <ExerciseMinutesCard />
         </div>
       </div>
+      <AdvancedCardsPreview />
     </section>
   );
 }

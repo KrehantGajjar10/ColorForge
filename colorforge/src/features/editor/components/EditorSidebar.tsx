@@ -38,7 +38,7 @@ export default function EditorSidebar({
 
   return (
     <aside
-      className="flex w-full shrink-0 flex-col border-b lg:h-[calc(100dvh-3.5rem)] lg:w-90 lg:border-b-0 lg:border-r xl:w-100"
+      className="flex max-h-[42%] min-h-0 w-full shrink-0 flex-col border-b lg:h-full lg:max-h-none lg:w-90 lg:border-b-0 lg:border-r xl:w-100"
       style={{
         borderColor: "var(--cf-border)",
         backgroundColor: "var(--cf-background)",

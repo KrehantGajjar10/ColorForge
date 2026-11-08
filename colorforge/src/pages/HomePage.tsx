@@ -26,7 +26,7 @@ export default function HomePage() {
 
   return (
     <main
-      className="flex min-h-[calc(100dvh-3.5rem)] flex-col overflow-hidden lg:flex-row"
+      className="flex h-screen min-h-0 flex-col overflow-hidden lg:flex-row"
       style={{
         backgroundColor: "var(--cf-background)",
         color: "var(--cf-foreground)",

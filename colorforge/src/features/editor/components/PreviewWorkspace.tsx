@@ -21,7 +21,7 @@ export default function PreviewWorkspace({
   const activePreview = previewModes.find((mode) => mode.id === previewMode);
 
   return (
-    <section className="flex min-h-140 min-w-0 flex-1 flex-col lg:h-[calc(100dvh-3.5rem)]">
+    <section className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
       <div
         className="flex min-h-14 items-center justify-between gap-3 overflow-x-auto border-b px-3 sm:px-5"
         style={{ borderColor: "var(--cf-border)" }}

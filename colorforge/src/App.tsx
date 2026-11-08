@@ -7,10 +7,15 @@ import HomePage from "./pages/HomePage";
 
 function EditorPage() {
   return (
-    <>
-      <AppHeader />
-      <HomePage />
-    </>
+    <div className="flex h-dvh flex-col overflow-hidden">
+      <div className="shrink-0">
+        <AppHeader />
+      </div>
+
+      <div className="min-h-0 flex-1 overflow-hidden">
+        <HomePage />
+      </div>
+    </div>
   );
 }
 
