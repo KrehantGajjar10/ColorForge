@@ -11,6 +11,17 @@ body {
   min-height: 100vh;
 }
 
+html:has(#editor-page),
+body:has(#editor-page) {
+  height: 100%;
+  overflow: hidden;
+}
+
+body:has(#editor-page) #root {
+  height: 100%;
+  overflow: hidden;
+}
+
 button,
 input,
 textarea,

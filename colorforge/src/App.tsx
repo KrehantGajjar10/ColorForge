@@ -7,7 +7,7 @@ import HomePage from "./pages/HomePage";
 
 function EditorPage() {
   return (
-    <div className="flex h-dvh flex-col overflow-hidden">
+    <div id="editor-page" className="flex h-dvh flex-col overflow-hidden">
       <div className="shrink-0">
         <AppHeader />
       </div>

@@ -470,7 +470,7 @@ function ExerciseMinutesCard() {
 
 export default function CardsPreview({ palette }: CardsPreviewProps) {
   return (
-    <section className="@container min-w-0 space-y-5">
+    <section className="@container min-w-0 w-full space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p

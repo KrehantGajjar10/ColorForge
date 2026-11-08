@@ -63,7 +63,7 @@ export default function PreviewWorkspace({
       </div>
 
       <div
-        className="min-h-0 flex-1 overflow-auto p-3 sm:p-5 lg:p-6"
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3 sm:p-5 lg:p-6"
         style={{ backgroundColor: "var(--cf-secondary)" }}
       >
         <div className="mx-auto max-w-350">
@@ -95,7 +95,7 @@ export default function PreviewWorkspace({
           </div>
 
           <div
-            className="min-h-120 rounded-xl border p-3 sm:p-5"
+            className="min-h-0 w-full rounded-xl border p-3 sm:p-5"
             style={{
               borderColor: "var(--cf-border)",
               backgroundColor: "var(--cf-background)",
