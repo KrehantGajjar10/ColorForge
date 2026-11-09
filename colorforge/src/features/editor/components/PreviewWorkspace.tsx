@@ -64,8 +64,11 @@ export default function PreviewWorkspace({
       className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden [&:fullscreen]:h-dvh [&:fullscreen]:w-screen [&:fullscreen]:overflow-hidden"
       style={{ backgroundColor: "var(--cf-secondary)" }}
     >
+      {/* Preview toolbar */}
       <div
-        className="flex min-h-14 items-center justify-between gap-3 overflow-x-auto border-b px-3 sm:px-5"
+        className={`flex min-h-14 shrink-0 items-center justify-between gap-3 overflow-x-auto border-b px-3 sm:px-5 ${
+          isFullscreen ? "sm:px-7 lg:px-10" : ""
+        }`}
         style={{ borderColor: "var(--cf-border)" }}
       >
         <nav
@@ -109,11 +112,14 @@ export default function PreviewWorkspace({
             onClick={toggleFullscreen}
             aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
             aria-pressed={isFullscreen}
-            title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-colors hover:bg-(--cf-background)"
+            title={isFullscreen ? "Exit fullscreen (Esc)" : "Fullscreen"}
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-colors hover:opacity-75 focus-visible:outline-2"
             style={{
               borderColor: "var(--cf-border)",
               color: "var(--cf-foreground)",
+              backgroundColor: isFullscreen
+                ? "var(--cf-background)"
+                : "transparent",
             }}
           >
             {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
@@ -121,12 +127,24 @@ export default function PreviewWorkspace({
         </div>
       </div>
 
+      {/* Scrollable preview area */}
       <div
-        className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3 sm:p-5 lg:p-6"
+        className={`min-h-0 flex-1 overflow-y-auto overscroll-contain p-3 sm:p-5 lg:p-6 ${
+          isFullscreen ? "xl:p-8 2xl:p-10" : ""
+        }`}
         style={{ backgroundColor: "var(--cf-secondary)" }}
       >
-        <div className="mx-auto max-w-350">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+        <div
+          className={`mx-auto w-full ${
+            isFullscreen ? "max-w-450" : "max-w-350"
+          }`}
+        >
+          {/* Preview information */}
+          <div
+            className={`mb-4 flex flex-wrap items-center justify-between gap-2 ${
+              isFullscreen ? "mb-6" : ""
+            }`}
+          >
             <div>
               <h2 className="text-sm font-semibold">{activePreview?.label}</h2>
               <p
@@ -153,8 +171,11 @@ export default function PreviewWorkspace({
             </div>
           </div>
 
+          {/* Preview content */}
           <div
-            className="min-h-0 w-full rounded-xl border p-3 sm:p-5"
+            className={`min-h-0 w-full rounded-xl border p-3 sm:p-5 ${
+              isFullscreen ? "sm:p-7 lg:p-8" : ""
+            }`}
             style={{
               borderColor: "var(--cf-border)",
               backgroundColor: "var(--cf-background)",
