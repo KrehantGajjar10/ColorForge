@@ -1,4 +1,6 @@
-import { Eye } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Eye, Maximize2, Minimize2 } from "lucide-react";
+import { toast } from "sonner";
 
 import CardsPreview from "./CardsPreview";
 import type { Palette } from "../../../types";
@@ -18,10 +20,50 @@ export default function PreviewWorkspace({
   previewMode,
   onPreviewModeChange,
 }: PreviewWorkspaceProps) {
+  const previewRef = useRef<HTMLElement | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
   const activePreview = previewModes.find((mode) => mode.id === previewMode);
 
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(document.fullscreenElement === previewRef.current);
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, []);
+
+  const toggleFullscreen = async () => {
+    const previewElement = previewRef.current;
+
+    if (!previewElement) return;
+
+    try {
+      if (document.fullscreenElement === previewElement) {
+        await document.exitFullscreen();
+        return;
+      }
+
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      }
+
+      await previewElement.requestFullscreen();
+    } catch {
+      toast.error("Unable to enter fullscreen mode.");
+    }
+  };
+
   return (
-    <section className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+    <section
+      ref={previewRef}
+      className="flex h-full min-h-0 min-w-0 flex-1 flex-col overflow-hidden [&:fullscreen]:h-dvh [&:fullscreen]:w-screen [&:fullscreen]:overflow-hidden"
+      style={{ backgroundColor: "var(--cf-secondary)" }}
+    >
       <div
         className="flex min-h-14 items-center justify-between gap-3 overflow-x-auto border-b px-3 sm:px-5"
         style={{ borderColor: "var(--cf-border)" }}
@@ -53,12 +95,29 @@ export default function PreviewWorkspace({
           })}
         </nav>
 
-        <div
-          className="hidden shrink-0 items-center gap-2 text-xs md:flex"
-          style={{ color: "var(--cf-muted-foreground)" }}
-        >
-          <Eye size={14} aria-hidden="true" />
-          Live preview
+        <div className="flex shrink-0 items-center gap-3">
+          <div
+            className="hidden items-center gap-2 text-xs md:flex"
+            style={{ color: "var(--cf-muted-foreground)" }}
+          >
+            <Eye size={14} aria-hidden="true" />
+            Live preview
+          </div>
+
+          <button
+            type="button"
+            onClick={toggleFullscreen}
+            aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+            aria-pressed={isFullscreen}
+            title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border transition-colors hover:bg-(--cf-background)"
+            style={{
+              borderColor: "var(--cf-border)",
+              color: "var(--cf-foreground)",
+            }}
+          >
+            {isFullscreen ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
+          </button>
         </div>
       </div>
 
