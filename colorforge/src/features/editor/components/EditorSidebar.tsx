@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { ChevronDown, ChevronRight, Search, Sparkles } from "lucide-react";
+import { ChevronDown, ChevronRight, Search } from "lucide-react";
 
 import PaletteEditor from "../../../components/palette/PaletteEditor";
 import PaletteGallery from "../../../components/palette/PaletteGallery";
 import TypographySettings from "./TypographySettings";
+import OtherSettings from "./OtherSettings";
 
 import type { Palette } from "../../../types";
 import type { FontFamily } from "../../../context/theme-context";
@@ -189,41 +190,7 @@ export default function EditorSidebar({
           />
         )}
 
-        {settingsTab === "other" && (
-          <section className="space-y-4">
-            <div>
-              <h2 className="text-sm font-semibold">Other settings</h2>
-              <p
-                className="mt-1 text-xs leading-5"
-                style={{ color: "var(--cf-muted-foreground)" }}
-              >
-                Radius and additional design settings will be introduced in
-                Chapter 18.
-              </p>
-            </div>
-
-            <div
-              className="rounded-xl border p-4"
-              style={{
-                borderColor: "var(--cf-border)",
-                backgroundColor: "var(--cf-secondary)",
-              }}
-            >
-              <Sparkles
-                size={18}
-                style={{ color: "var(--cf-primary)" }}
-                aria-hidden="true"
-              />
-              <p className="mt-3 text-sm font-medium">More theme controls</p>
-              <p
-                className="mt-1 text-xs leading-5"
-                style={{ color: "var(--cf-muted-foreground)" }}
-              >
-                This panel is reserved for the next settings chapter.
-              </p>
-            </div>
-          </section>
-        )}
+        {settingsTab === "other" && <OtherSettings />}
       </div>
 
       <div

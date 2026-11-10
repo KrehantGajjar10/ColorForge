@@ -1,0 +1,143 @@
+import { useState } from "react";
+import { SlidersHorizontal } from "lucide-react";
+
+export default function OtherSettings() {
+  const [radius, setRadius] = useState(12);
+
+  return (
+    <section className="space-y-5">
+      <div>
+        <h2 className="text-sm font-semibold">Other settings</h2>
+        <p
+          className="mt-1 text-xs leading-5"
+          style={{ color: "var(--cf-muted-foreground)" }}
+        >
+          Fine-tune additional details of your theme.
+        </p>
+      </div>
+
+      <div
+        className="space-y-4 rounded-xl border p-4"
+        style={{
+          borderColor: "var(--cf-border)",
+          backgroundColor: "var(--cf-secondary)",
+        }}
+      >
+        <div className="flex items-center gap-2">
+          <SlidersHorizontal
+            size={16}
+            style={{ color: "var(--cf-primary)" }}
+            aria-hidden="true"
+          />
+          <h3 className="text-xs font-semibold">Border radius</h3>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <label
+            htmlFor="border-radius"
+            className="text-xs"
+            style={{ color: "var(--cf-muted-foreground)" }}
+          >
+            Corner roundness
+          </label>
+
+          <span
+            className="rounded-md border px-2 py-1 text-xs font-medium tabular-nums"
+            style={{
+              borderColor: "var(--cf-border)",
+              color: "var(--cf-foreground)",
+            }}
+          >
+            {radius}px
+          </span>
+        </div>
+
+        <input
+          id="border-radius"
+          type="range"
+          min={0}
+          max={24}
+          step={2}
+          value={radius}
+          onChange={(event) => setRadius(Number(event.target.value))}
+          className="h-2 w-full cursor-pointer accent-(--cf-primary)"
+          aria-label="Border radius in pixels"
+        />
+
+        <div
+          className="flex justify-between text-[10px]"
+          style={{ color: "var(--cf-muted-foreground)" }}
+        >
+          <span>Sharp · 0px</span>
+          <span>Rounded · 24px</span>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <div>
+          <h3 className="text-xs font-semibold">Preview</h3>
+          <p
+            className="mt-1 text-[11px]"
+            style={{ color: "var(--cf-muted-foreground)" }}
+          >
+            See how the selected corner style looks.
+          </p>
+        </div>
+
+        <div
+          className="space-y-3 rounded-xl border p-4"
+          style={{
+            borderColor: "var(--cf-border)",
+            backgroundColor: "var(--cf-background)",
+          }}
+        >
+          <div
+            className="border p-3"
+            style={{
+              borderRadius: `${radius}px`,
+              borderColor: "var(--cf-border)",
+              backgroundColor: "var(--cf-secondary)",
+            }}
+          >
+            <div
+              className="mb-2 h-2 w-20 rounded-full"
+              style={{ backgroundColor: "var(--cf-primary)" }}
+            />
+            <p className="text-xs font-medium">Preview card</p>
+            <p
+              className="mt-1 text-[11px]"
+              style={{ color: "var(--cf-muted-foreground)" }}
+            >
+              A simple example of your selected radius.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="px-3 py-2 text-xs font-medium"
+              style={{
+                borderRadius: `${radius}px`,
+                backgroundColor: "var(--cf-primary)",
+                color: "var(--cf-primary-foreground)",
+              }}
+            >
+              Button
+            </button>
+
+            <div
+              className="flex-1 border px-3 py-2 text-xs"
+              style={{
+                borderRadius: `${radius}px`,
+                borderColor: "var(--cf-border)",
+                color: "var(--cf-muted-foreground)",
+              }}
+            >
+              Input field
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
