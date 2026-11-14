@@ -124,6 +124,7 @@ function getInitialPalette(): Palette {
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const [palette, setPalette] = useState<Palette>(getInitialPalette);
   const [colorMode, setColorMode] = useState<ColorMode>(getInitialColorMode);
+  const [borderRadius, setBorderRadius] = useState(12);
   const [fontFamily, setFontFamily] =
     useState<FontFamily>(getInitialFontFamily);
 
@@ -198,7 +199,9 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
         palette,
         colorMode,
         fontFamily,
+        borderRadius,
         setFontFamily,
+        setBorderRadius,
         toggleColorMode,
         selectPalette,
         selectPaletteById,
@@ -210,7 +213,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       <div
         className="min-h-screen transition-colors duration-300"
         style={{
-          ...createThemeVariables(palette.tokens, colorMode),
+          ...createThemeVariables(palette.tokens, colorMode, borderRadius),
           fontFamily,
         }}
       >

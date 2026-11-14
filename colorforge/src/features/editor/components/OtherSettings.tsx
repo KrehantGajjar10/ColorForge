@@ -1,8 +1,8 @@
-import { useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
+import { useTheme } from "../../../context/useTheme";
 
 export default function OtherSettings() {
-  const [radius, setRadius] = useState(12);
+  const { borderRadius, setBorderRadius } = useTheme();
 
   return (
     <section className="space-y-5">
@@ -48,7 +48,7 @@ export default function OtherSettings() {
               color: "var(--cf-foreground)",
             }}
           >
-            {radius}px
+            {borderRadius}px
           </span>
         </div>
 
@@ -58,8 +58,8 @@ export default function OtherSettings() {
           min={0}
           max={24}
           step={2}
-          value={radius}
-          onChange={(event) => setRadius(Number(event.target.value))}
+          value={borderRadius}
+          onChange={(event) => setBorderRadius(Number(event.target.value))}
           className="h-2 w-full cursor-pointer accent-(--cf-primary)"
           aria-label="Border radius in pixels"
         />
@@ -94,7 +94,7 @@ export default function OtherSettings() {
           <div
             className="border p-3"
             style={{
-              borderRadius: `${radius}px`,
+              borderRadius: "var(--cf-radius)",
               borderColor: "var(--cf-border)",
               backgroundColor: "var(--cf-secondary)",
             }}
@@ -117,7 +117,7 @@ export default function OtherSettings() {
               type="button"
               className="px-3 py-2 text-xs font-medium"
               style={{
-                borderRadius: `${radius}px`,
+                borderRadius: "var(--cf-radius)",
                 backgroundColor: "var(--cf-primary)",
                 color: "var(--cf-primary-foreground)",
               }}
@@ -128,7 +128,7 @@ export default function OtherSettings() {
             <div
               className="flex-1 border px-3 py-2 text-xs"
               style={{
-                borderRadius: `${radius}px`,
+                borderRadius: "var(--cf-radius)",
                 borderColor: "var(--cf-border)",
                 color: "var(--cf-muted-foreground)",
               }}

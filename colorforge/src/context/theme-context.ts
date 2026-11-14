@@ -37,7 +37,9 @@ export interface ThemeContextValue {
   palette: Palette;
   colorMode: ColorMode;
   fontFamily: FontFamily;
+  borderRadius: number;
   setFontFamily: (fontFamily: FontFamily) => void;
+  setBorderRadius: (radius: number) => void;
   toggleColorMode: () => void;
   selectPalette: (palette: Palette) => void;
   selectPaletteById: (id: string) => void;
@@ -51,6 +53,7 @@ export const ThemeContext = createContext<ThemeContextValue | null>(null);
 export function createThemeVariables(
   tokens: ThemeTokens,
   mode: ColorMode = "light",
+  borderRadius = 12,
 ): CSSProperties {
   const surfaceTokens =
     mode === "dark"
@@ -86,5 +89,6 @@ export function createThemeVariables(
     "--cf-muted": surfaceTokens.muted,
     "--cf-muted-foreground": surfaceTokens.mutedForeground,
     "--cf-border": surfaceTokens.border,
+    "--cf-radius": `${borderRadius}px`,
   } as CSSProperties;
 }
