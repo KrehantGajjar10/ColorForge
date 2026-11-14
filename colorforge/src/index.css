@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+@theme inline {
+  --radius: var(--cf-radius);
+  --radius-xs: calc(var(--cf-radius) * 0.25);
+  --radius-sm: calc(var(--cf-radius) * 0.5);
+  --radius-md: calc(var(--cf-radius) * 0.75);
+  --radius-lg: var(--cf-radius);
+  --radius-xl: calc(var(--cf-radius) * 1.25);
+  --radius-2xl: calc(var(--cf-radius) * 1.5);
+  --radius-3xl: calc(var(--cf-radius) * 2);
+  --radius-4xl: calc(var(--cf-radius) * 2.5);
+}
+
 html {
   min-width: 320px;
   scroll-behavior: smooth;

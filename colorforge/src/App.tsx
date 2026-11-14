@@ -34,7 +34,7 @@ function App() {
           closeButton
           toastOptions={{
             style: {
-              borderRadius: "12px",
+              borderRadius: "var(--cf-radius)",
             },
           }}
         />

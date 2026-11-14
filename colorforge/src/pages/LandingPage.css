@@ -96,7 +96,7 @@
   height: 36px;
   place-items: center;
   border: 1px solid var(--cf-border);
-  border-radius: 11px;
+  border-radius: calc(var(--cf-radius) * 0.92);
   background: var(--cf-soft-accent);
   color: var(--cf-soft-accent-foreground);
   transition:
@@ -144,7 +144,7 @@
   justify-content: center;
   gap: 9px;
   border: 1px solid transparent;
-  border-radius: 9px;
+  border-radius: calc(var(--cf-radius) * 0.75);
   padding: 0 19px;
   font-size: 12px;
   font-weight: 700;
@@ -468,7 +468,7 @@
   align-items: center;
   gap: 10px;
   border: 1px solid var(--cf-border);
-  border-radius: 10px;
+  border-radius: calc(var(--cf-radius) * 0.83);
   padding: 9px 11px;
   background: var(--cf-surface);
   color: var(--cf-surface-foreground);
@@ -501,7 +501,7 @@
   flex-shrink: 0;
   overflow: hidden;
   border: 1px solid rgb(128 128 128 / 15%);
-  border-radius: 6px;
+  border-radius: calc(var(--cf-radius) * 0.5);
 }
 
 .cf-chip-color {
@@ -559,7 +559,7 @@
 .cf-feature-card {
   min-height: 190px;
   border: 1px solid var(--cf-border);
-  border-radius: 13px;
+  border-radius: calc(var(--cf-radius) * 1.08);
   padding: 23px;
   background: var(--cf-surface);
   color: var(--cf-surface-foreground);
@@ -581,7 +581,7 @@
   width: 40px;
   height: 40px;
   place-items: center;
-  border-radius: 11px;
+  border-radius: calc(var(--cf-radius) * 0.92);
   background: var(--cf-soft-accent);
   color: var(--cf-soft-accent-foreground);
   transition:
@@ -621,7 +621,7 @@
   justify-content: center;
   margin: 0 auto 65px;
   border: 1px solid var(--cf-border);
-  border-radius: 18px;
+  border-radius: calc(var(--cf-radius) * 1.5);
   padding: 48px 24px;
   background: var(--cf-surface);
   color: var(--cf-surface-foreground);
@@ -639,7 +639,7 @@
   place-items: center;
   margin-bottom: 20px;
   border: 1px solid var(--cf-border);
-  border-radius: 13px;
+  border-radius: calc(var(--cf-radius) * 1.08);
   background: var(--cf-soft-accent);
   color: var(--cf-soft-accent-foreground);
 }
@@ -676,7 +676,7 @@
 .cf-footer .cf-brand-mark {
   width: 30px;
   height: 30px;
-  border-radius: 9px;
+  border-radius: calc(var(--cf-radius) * 0.75);
 }
 
 .cf-footer p,
@@ -923,7 +923,7 @@
     width: calc(100% - 32px);
     min-height: 280px;
     margin-bottom: 38px;
-    border-radius: 14px;
+    border-radius: calc(var(--cf-radius) * 1.17);
     padding: 36px 20px;
   }
 
