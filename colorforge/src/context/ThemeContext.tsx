@@ -17,6 +17,7 @@ interface ThemeProviderProps {
 const STORAGE_KEY = "colorforge-palette";
 const MODE_STORAGE_KEY = "colorforge-color-mode";
 const FONT_STORAGE_KEY = "colorforge-font-family";
+const RADIUS_STORAGE_KEY = "colorforge-border-radius";
 
 function getInitialColorMode(): ColorMode {
   try {
@@ -39,6 +40,31 @@ function getInitialFontFamily(): FontFamily {
   }
 
   return fontFamilies[0].value;
+}
+
+function getInitialBorderRadius(): number {
+  try {
+    const stored = localStorage.getItem(RADIUS_STORAGE_KEY);
+
+    if (stored === null) {
+      return 12;
+    }
+
+    const radius = Number(stored);
+
+    if (
+      Number.isInteger(radius) &&
+      radius >= 0 &&
+      radius <= 24 &&
+      radius % 2 === 0
+    ) {
+      return radius;
+    }
+  } catch {
+    // Use the default radius when browser storage is unavailable.
+  }
+
+  return 12;
 }
 
 function getPaletteFromUrl(): Palette | null {
@@ -124,9 +150,19 @@ function getInitialPalette(): Palette {
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const [palette, setPalette] = useState<Palette>(getInitialPalette);
   const [colorMode, setColorMode] = useState<ColorMode>(getInitialColorMode);
-  const [borderRadius, setBorderRadius] = useState(12);
+  const [borderRadius, setBorderRadius] = useState<number>(
+    getInitialBorderRadius,
+  );
   const [fontFamily, setFontFamily] =
     useState<FontFamily>(getInitialFontFamily);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(RADIUS_STORAGE_KEY, String(borderRadius));
+    } catch {
+      // Keep the selected radius working for the current session.
+    }
+  }, [borderRadius]);
 
   useEffect(() => {
     try {

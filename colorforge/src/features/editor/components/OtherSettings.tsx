@@ -1,4 +1,4 @@
-import { SlidersHorizontal } from "lucide-react";
+import { RotateCcw, SlidersHorizontal } from "lucide-react";
 import { useTheme } from "../../../context/useTheme";
 
 export default function OtherSettings() {
@@ -41,15 +41,31 @@ export default function OtherSettings() {
             Corner roundness
           </label>
 
-          <span
-            className="rounded-md border px-2 py-1 text-xs font-medium tabular-nums"
-            style={{
-              borderColor: "var(--cf-border)",
-              color: "var(--cf-foreground)",
-            }}
-          >
-            {borderRadius}px
-          </span>
+          <div className="flex items-center gap-2">
+            <span
+              className="rounded-md border px-2 py-1 text-xs font-medium tabular-nums"
+              style={{
+                borderColor: "var(--cf-border)",
+                color: "var(--cf-foreground)",
+              }}
+            >
+              {borderRadius}px
+            </span>
+
+            {borderRadius !== 12 && (
+              <button
+                type="button"
+                onClick={() => setBorderRadius(12)}
+                className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-medium transition-colors hover:bg-(--cf-muted)"
+                style={{ color: "var(--cf-muted-foreground)" }}
+                aria-label="Reset border radius to 12 pixels"
+                title="Reset to default"
+              >
+                <RotateCcw size={12} />
+                Reset
+              </button>
+            )}
+          </div>
         </div>
 
         <input
