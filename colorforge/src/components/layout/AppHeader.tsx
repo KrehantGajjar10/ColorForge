@@ -10,18 +10,32 @@ import {
   savePaletteSnapshot,
 } from "../../utils/savedPalettes";
 import { createPaletteShareUrl } from "../../utils/createPaletteShareUrl";
-import { exportPaletteAsJson } from "../../utils/exportPalette";
+import ExportCssDialog from "../palette/ExportCssDialog";
+import {
+  generatePaletteCss,
+  exportPaletteAsJson,
+} from "../../utils/exportPalette";
 import SavePaletteDialog from "../palette/SavePaletteDialog";
 import HeaderActions from "./header/HeaderActions";
 import ThemeSelector from "./header/ThemeSelector";
 
 export default function AppHeader() {
-  const { palette, colorMode, toggleColorMode, selectPalette, resetPalette } =
-    useTheme();
+  const {
+    palette,
+    colorMode,
+    fontFamily,
+    borderRadius,
+    toggleColorMode,
+    selectPalette,
+    resetPalette,
+  } = useTheme();
 
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
+  const [isCssExportOpen, setIsCssExportOpen] = useState(false);
   const [savedPalettes, setSavedPalettes] =
     useState<Palette[]>(getSavedPalettes);
+
+  const generatedCss = generatePaletteCss(palette, borderRadius, fontFamily);
 
   useEffect(() => {
     function handleEscape(event: KeyboardEvent) {
@@ -141,6 +155,7 @@ export default function AppHeader() {
             onSave={handleOpenSaveDialog}
             onShare={handleShare}
             onExport={() => exportPaletteAsJson(palette)}
+            onExportCss={() => setIsCssExportOpen(true)}
           />
         </div>
       </header>
@@ -150,6 +165,14 @@ export default function AppHeader() {
           defaultName={palette.name}
           onSave={handleSave}
           onClose={() => setIsSaveDialogOpen(false)}
+        />
+      )}
+
+      {isCssExportOpen && (
+        <ExportCssDialog
+          css={generatedCss}
+          paletteName={palette.name}
+          onClose={() => setIsCssExportOpen(false)}
         />
       )}
     </>

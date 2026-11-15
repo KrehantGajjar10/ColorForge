@@ -16,6 +16,7 @@ interface HeaderActionsProps {
   onSave: () => void;
   onShare: () => void;
   onExport: () => void;
+  onExportCss: () => void;
 }
 
 export default function HeaderActions({
@@ -25,6 +26,7 @@ export default function HeaderActions({
   onSave,
   onShare,
   onExport,
+  onExportCss,
 }: HeaderActionsProps) {
   const iconButtonStyle = {
     borderColor: "var(--cf-border)",
@@ -96,13 +98,13 @@ export default function HeaderActions({
 
       <button
         type="button"
-        disabled
-        title="Code export is planned for a later chapter"
-        className="hidden h-9 items-center gap-1.5 rounded-lg border px-3 text-xs font-medium opacity-40 lg:inline-flex"
+        onClick={onExportCss}
+        className="flex h-9 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-medium transition-opacity hover:opacity-70 sm:px-3"
         style={iconButtonStyle}
+        title="Export theme as CSS"
       >
         <Code2 size={14} aria-hidden="true" />
-        Code
+        <span className="hidden sm:inline">CSS</span>
       </button>
     </div>
   );
