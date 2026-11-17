@@ -3,6 +3,7 @@ import { ChevronDown, ChevronRight, Search } from "lucide-react";
 
 import PaletteEditor from "../../../components/palette/PaletteEditor";
 import PaletteGallery from "../../../components/palette/PaletteGallery";
+import SavedPaletteSection from "../../../components/palette/SavedPaletteSection";
 import TypographySettings from "./TypographySettings";
 import OtherSettings from "./OtherSettings";
 
@@ -13,6 +14,7 @@ import { settingTabs, type SettingsTab } from "../editor.types";
 interface EditorSidebarProps {
   palette: Palette;
   palettes: Palette[];
+  savedPalettes: Palette[];
   fontFamily: FontFamily;
   onSelectPalette: (palette: Palette) => void;
   onUpdatePalette: (palette: Palette) => void;
@@ -23,6 +25,7 @@ interface EditorSidebarProps {
 export default function EditorSidebar({
   palette,
   palettes,
+  savedPalettes,
   fontFamily,
   onSelectPalette,
   onUpdatePalette,
@@ -34,6 +37,10 @@ export default function EditorSidebar({
   const [paletteListOpen, setPaletteListOpen] = useState(true);
 
   const filteredPalettes = palettes.filter((item) =>
+    item.name.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  const filteredSavedPalettes = savedPalettes.filter((item) =>
     item.name.toLowerCase().includes(search.toLowerCase()),
   );
 
@@ -161,6 +168,13 @@ export default function EditorSidebar({
                 )}
               </button>
 
+              <SavedPaletteSection
+                palettes={filteredSavedPalettes}
+                selectedId={palette.id}
+                fallbackPalette={palettes[0]}
+                onSelect={onSelectPalette}
+              />
+
               {paletteListOpen && (
                 <PaletteGallery
                   palettes={filteredPalettes}
@@ -201,7 +215,7 @@ export default function EditorSidebar({
         }}
       >
         <span>ColorForge Theme Editor</span>
-        <span>Chapter 15</span>
+        <span>Live Preview</span>
       </div>
     </aside>
   );

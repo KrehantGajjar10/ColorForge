@@ -9,6 +9,7 @@ import {
   getSavedPalettes,
   savePaletteSnapshot,
   saveImportedPalette,
+  SAVED_PALETTES_CHANGE_EVENT,
   type ImportedPalette,
 } from "../../utils/savedPalettes";
 import { createPaletteShareUrl } from "../../utils/createPaletteShareUrl";
@@ -51,6 +52,21 @@ export default function AppHeader() {
 
     window.addEventListener("keydown", handleEscape);
     return () => window.removeEventListener("keydown", handleEscape);
+  }, []);
+
+  useEffect(() => {
+    function refreshSavedPalettes() {
+      setSavedPalettes(getSavedPalettes());
+    }
+
+    window.addEventListener(SAVED_PALETTES_CHANGE_EVENT, refreshSavedPalettes);
+
+    return () => {
+      window.removeEventListener(
+        SAVED_PALETTES_CHANGE_EVENT,
+        refreshSavedPalettes,
+      );
+    };
   }, []);
 
   const availablePalettes = useMemo(() => {

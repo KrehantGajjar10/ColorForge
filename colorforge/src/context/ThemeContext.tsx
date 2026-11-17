@@ -1,7 +1,12 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { palettes } from "../data/palettes";
 import type { Palette, ThemeTokens } from "../types";
-import { isRecord, isValidThemeTokens } from "../utils/themeValidation";
+import {
+  isRecord,
+  isValidPalette,
+  isValidThemeTokens,
+} from "../utils/themeValidation";
+import { getSavedPalettes } from "../utils/savedPalettes";
 import {
   ThemeContext,
   createThemeVariables,
@@ -121,27 +126,31 @@ function getInitialPalette(): Palette {
 
     const parsed: unknown = JSON.parse(stored);
 
-    if (
-      !isRecord(parsed) ||
-      typeof parsed.id !== "string" ||
-      !isValidThemeTokens(parsed.tokens)
-    ) {
+    if (!isValidPalette(parsed)) {
       return palettes[0];
     }
 
     const original = palettes.find((item) => item.id === parsed.id);
 
-    if (!original) {
+    if (original) {
+      return {
+        ...original,
+        tokens: {
+          ...original.tokens,
+          ...parsed.tokens,
+        },
+      };
+    }
+
+    const savedPalette = getSavedPalettes().find(
+      (item) => item.id === parsed.id,
+    );
+
+    if (!savedPalette) {
       return palettes[0];
     }
 
-    return {
-      ...original,
-      tokens: {
-        ...original.tokens,
-        ...parsed.tokens,
-      },
-    };
+    return parsed;
   } catch {
     return palettes[0];
   }
