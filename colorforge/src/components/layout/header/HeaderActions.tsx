@@ -6,6 +6,7 @@ import {
   RotateCcw,
   Save,
   Sun,
+  Upload,
 } from "lucide-react";
 import type { ColorMode } from "../../../context/theme-context";
 
@@ -15,6 +16,7 @@ interface HeaderActionsProps {
   onToggleColorMode: () => void;
   onSave: () => void;
   onShare: () => void;
+  onImport: () => void;
   onExport: () => void;
   onExportCss: () => void;
 }
@@ -25,6 +27,7 @@ export default function HeaderActions({
   onToggleColorMode,
   onSave,
   onShare,
+  onImport,
   onExport,
   onExportCss,
 }: HeaderActionsProps) {
@@ -83,6 +86,18 @@ export default function HeaderActions({
       >
         <Link2 size={14} aria-hidden="true" />
         <span className="hidden md:inline">Share</span>
+      </button>
+
+      <button
+        type="button"
+        onClick={onImport}
+        className="flex h-9 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-medium transition-opacity hover:opacity-70 sm:px-3"
+        style={iconButtonStyle}
+        title="Import palette from JSON"
+        aria-label="Import palette from JSON"
+      >
+        <Upload size={14} aria-hidden="true" />
+        <span className="hidden sm:inline">Import</span>
       </button>
 
       <button

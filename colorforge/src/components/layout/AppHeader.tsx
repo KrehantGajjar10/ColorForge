@@ -8,9 +8,12 @@ import type { Palette } from "../../types";
 import {
   getSavedPalettes,
   savePaletteSnapshot,
+  saveImportedPalette,
+  type ImportedPalette,
 } from "../../utils/savedPalettes";
 import { createPaletteShareUrl } from "../../utils/createPaletteShareUrl";
 import ExportCssDialog from "../palette/ExportCssDialog";
+import ImportPaletteDialog from "../palette/ImportPaletteDialog";
 import {
   generatePaletteCss,
   exportPaletteAsJson,
@@ -31,6 +34,7 @@ export default function AppHeader() {
   } = useTheme();
 
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [isCssExportOpen, setIsCssExportOpen] = useState(false);
   const [savedPalettes, setSavedPalettes] =
     useState<Palette[]>(getSavedPalettes);
@@ -41,6 +45,7 @@ export default function AppHeader() {
     function handleEscape(event: KeyboardEvent) {
       if (event.key === "Escape") {
         setIsSaveDialogOpen(false);
+        setIsImportDialogOpen(false);
       }
     }
 
@@ -82,6 +87,25 @@ export default function AppHeader() {
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Couldn't save this palette.",
+      );
+    }
+  }
+
+  function handleImport(importedPalette: ImportedPalette) {
+    try {
+      const savedPalette = saveImportedPalette(importedPalette);
+
+      setSavedPalettes(getSavedPalettes());
+      setIsImportDialogOpen(false);
+
+      toast.success("Palette imported", {
+        description: `${savedPalette.name} was added to your saved palettes.`,
+      });
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Couldn't import this palette.",
       );
     }
   }
@@ -154,6 +178,7 @@ export default function AppHeader() {
             onToggleColorMode={toggleColorMode}
             onSave={handleOpenSaveDialog}
             onShare={handleShare}
+            onImport={() => setIsImportDialogOpen(true)}
             onExport={() => exportPaletteAsJson(palette)}
             onExportCss={() => setIsCssExportOpen(true)}
           />
@@ -165,6 +190,13 @@ export default function AppHeader() {
           defaultName={palette.name}
           onSave={handleSave}
           onClose={() => setIsSaveDialogOpen(false)}
+        />
+      )}
+
+      {isImportDialogOpen && (
+        <ImportPaletteDialog
+          onImport={handleImport}
+          onClose={() => setIsImportDialogOpen(false)}
         />
       )}
 
