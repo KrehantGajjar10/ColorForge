@@ -14,6 +14,7 @@ interface SavedPaletteSectionProps {
   palettes: Palette[];
   selectedId: string;
   fallbackPalette: Palette;
+  hasSavedPalettes: boolean;
   onSelect: (palette: Palette) => void;
 }
 
@@ -22,6 +23,7 @@ export default function SavedPaletteSection({
   selectedId,
   fallbackPalette,
   onSelect,
+  hasSavedPalettes,
 }: SavedPaletteSectionProps) {
   const [isOpen, setIsOpen] = useState(true);
   const [sortBy, setSortBy] = useState<SortOption>("recent");
@@ -165,12 +167,19 @@ export default function SavedPaletteSection({
                 className="mx-auto mb-2"
                 style={{ color: "var(--cf-muted-foreground)" }}
               />
-              <p className="text-xs font-medium">No saved palettes yet</p>
+              <p className="text-xs font-medium">
+                {hasSavedPalettes
+                  ? "No matching saved palettes"
+                  : "No saved palettes yet"}
+              </p>
+
               <p
                 className="mt-1 text-[11px] leading-5"
                 style={{ color: "var(--cf-muted-foreground)" }}
               >
-                Save or import a palette to see it here.
+                {hasSavedPalettes
+                  ? "Try another search to find a saved palette."
+                  : "Save or import a palette to see it here."}
               </p>
             </div>
           ) : (

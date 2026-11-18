@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, ChevronRight, Search } from "lucide-react";
+import { ChevronDown, ChevronRight, Palette, Search } from "lucide-react";
 
 import PaletteEditor from "../../../components/palette/PaletteEditor";
 import PaletteGallery from "../../../components/palette/PaletteGallery";
@@ -7,17 +7,17 @@ import SavedPaletteSection from "../../../components/palette/SavedPaletteSection
 import TypographySettings from "./TypographySettings";
 import OtherSettings from "./OtherSettings";
 
-import type { Palette } from "../../../types";
+import type { Palette as PaletteType } from "../../../types";
 import type { FontFamily } from "../../../context/theme-context";
 import { settingTabs, type SettingsTab } from "../editor.types";
 
 interface EditorSidebarProps {
-  palette: Palette;
-  palettes: Palette[];
-  savedPalettes: Palette[];
+  palette: PaletteType;
+  palettes: PaletteType[];
+  savedPalettes: PaletteType[];
   fontFamily: FontFamily;
-  onSelectPalette: (palette: Palette) => void;
-  onUpdatePalette: (palette: Palette) => void;
+  onSelectPalette: (palette: PaletteType) => void;
+  onUpdatePalette: (palette: PaletteType) => void;
   onResetPalette: () => void;
   onFontFamilyChange: (fontFamily: FontFamily) => void;
 }
@@ -36,12 +36,14 @@ export default function EditorSidebar({
   const [search, setSearch] = useState("");
   const [paletteListOpen, setPaletteListOpen] = useState(true);
 
+  const normalizedSearch = search.trim().toLowerCase();
+
   const filteredPalettes = palettes.filter((item) =>
-    item.name.toLowerCase().includes(search.toLowerCase()),
+    item.name.toLowerCase().includes(normalizedSearch),
   );
 
   const filteredSavedPalettes = savedPalettes.filter((item) =>
-    item.name.toLowerCase().includes(search.toLowerCase()),
+    item.name.toLowerCase().includes(normalizedSearch),
   );
 
   return (
@@ -54,44 +56,82 @@ export default function EditorSidebar({
       aria-label="Theme settings"
     >
       <div
-        className="grid grid-cols-3 gap-1 border-b p-2.5"
+        className="shrink-0 border-b px-4 pb-3 pt-4 sm:px-5"
         style={{ borderColor: "var(--cf-border)" }}
-        role="tablist"
-        aria-label="Theme settings sections"
       >
-        {settingTabs.map((tab) => {
-          const Icon = tab.icon;
-          const active = settingsTab === tab.id;
+        <div className="mb-4 flex items-center gap-3">
+          <div
+            className="flex size-9 shrink-0 items-center justify-center rounded-xl border"
+            style={{
+              borderColor: "var(--cf-border)",
+              backgroundColor: "var(--cf-secondary)",
+              color: "var(--cf-foreground)",
+            }}
+          >
+            <Palette size={17} aria-hidden="true" />
+          </div>
 
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              role="tab"
-              aria-selected={active}
-              onClick={() => setSettingsTab(tab.id)}
-              className="flex h-10 items-center justify-center gap-2 rounded-lg px-2 text-xs font-medium transition-colors"
-              style={{
-                backgroundColor: active ? "var(--cf-primary)" : "transparent",
-                color: active
-                  ? "var(--cf-primary-foreground)"
-                  : "var(--cf-muted-foreground)",
-              }}
+          <div className="min-w-0">
+            <h2 className="text-sm font-semibold tracking-tight">
+              Theme editor
+            </h2>
+            <p
+              className="mt-0.5 text-xs"
+              style={{ color: "var(--cf-muted-foreground)" }}
             >
-              <Icon size={15} aria-hidden="true" />
-              {tab.label}
-            </button>
-          );
-        })}
+              Customize your design system
+            </p>
+          </div>
+        </div>
+
+        <div
+          className="grid grid-cols-3 gap-1 rounded-xl border p-1"
+          style={{
+            borderColor: "var(--cf-border)",
+            backgroundColor: "var(--cf-muted)",
+          }}
+          role="tablist"
+          aria-label="Theme settings sections"
+        >
+          {settingTabs.map((tab) => {
+            const Icon = tab.icon;
+            const active = settingsTab === tab.id;
+
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => setSettingsTab(tab.id)}
+                className="flex h-9 min-w-0 items-center justify-center gap-1.5 rounded-lg px-1.5 text-xs font-medium transition-all duration-200 sm:gap-2 sm:px-2"
+                style={{
+                  backgroundColor: active
+                    ? "var(--cf-background)"
+                    : "transparent",
+                  color: active
+                    ? "var(--cf-foreground)"
+                    : "var(--cf-muted-foreground)",
+                  boxShadow: active ? "0 1px 3px rgba(0, 0, 0, 0.08)" : "none",
+                }}
+              >
+                <Icon size={14} aria-hidden="true" />
+                <span className="truncate">{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3 sm:p-4">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-5">
         {settingsTab === "colors" && (
-          <div className="space-y-5">
+          <div className="space-y-6">
             <section>
               <div className="mb-3 flex items-center justify-between gap-2">
                 <div>
-                  <h2 className="text-sm font-semibold">Color system</h2>
+                  <h3 className="text-sm font-semibold tracking-tight">
+                    Color system
+                  </h3>
                   <p
                     className="mt-1 text-xs"
                     style={{ color: "var(--cf-muted-foreground)" }}
@@ -103,7 +143,7 @@ export default function EditorSidebar({
                 <button
                   type="button"
                   onClick={onResetPalette}
-                  className="rounded-md px-2 py-1.5 text-xs transition-opacity hover:opacity-70"
+                  className="rounded-md px-2 py-1.5 text-xs font-medium transition-colors hover:opacity-70"
                   style={{ color: "var(--cf-muted-foreground)" }}
                 >
                   Reset
@@ -111,30 +151,36 @@ export default function EditorSidebar({
               </div>
 
               <div
-                className="mb-4 flex items-center gap-2 rounded-lg border px-3 py-2"
+                className="mb-4 flex items-center gap-2 rounded-lg border px-3 py-2.5"
                 style={{
                   borderColor: "var(--cf-border)",
                   backgroundColor: "var(--cf-secondary)",
                 }}
               >
                 <span
-                  className="h-3 w-3 shrink-0 rounded-full"
+                  className="size-3 shrink-0 rounded-full"
                   style={{ backgroundColor: "var(--cf-primary)" }}
                 />
                 <span className="min-w-0 flex-1 truncate text-xs font-medium">
                   {palette.name}
                 </span>
                 <span
-                  className="text-[10px]"
-                  style={{ color: "var(--cf-muted-foreground)" }}
+                  className="rounded-md px-1.5 py-0.5 text-[10px] font-medium"
+                  style={{
+                    backgroundColor: "var(--cf-background)",
+                    color: "var(--cf-muted-foreground)",
+                  }}
                 >
                   Active
                 </span>
               </div>
 
               <label
-                className="mb-4 flex h-10 items-center gap-2 rounded-lg border px-3"
-                style={{ borderColor: "var(--cf-border)" }}
+                className="mb-5 flex h-10 items-center gap-2 rounded-lg border px-3 transition-colors focus-within:border-(--cf-primary)"
+                style={{
+                  borderColor: "var(--cf-border)",
+                  backgroundColor: "var(--cf-background)",
+                }}
               >
                 <Search
                   size={15}
@@ -144,44 +190,61 @@ export default function EditorSidebar({
                 <input
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Search palettes..."
+                  placeholder="Search all palettes..."
                   className="min-w-0 flex-1 bg-transparent text-xs outline-none placeholder:opacity-60"
-                  aria-label="Search palettes"
+                  aria-label="Search saved and theme palettes"
                 />
               </label>
 
-              <button
-                type="button"
-                onClick={() => setPaletteListOpen((open) => !open)}
-                aria-expanded={paletteListOpen}
-                className="mb-3 flex w-full items-center justify-between rounded-md px-2 py-2 text-left text-[10px] font-semibold uppercase tracking-[0.12em]"
-                style={{
-                  backgroundColor: "var(--cf-muted)",
-                  color: "var(--cf-muted-foreground)",
-                }}
-              >
-                <span>Theme palettes</span>
-                {paletteListOpen ? (
-                  <ChevronDown size={14} aria-hidden="true" />
-                ) : (
-                  <ChevronRight size={14} aria-hidden="true" />
-                )}
-              </button>
-
-              <SavedPaletteSection
-                palettes={filteredSavedPalettes}
-                selectedId={palette.id}
-                fallbackPalette={palettes[0]}
-                onSelect={onSelectPalette}
-              />
-
-              {paletteListOpen && (
-                <PaletteGallery
-                  palettes={filteredPalettes}
+              <div className="space-y-6">
+                <SavedPaletteSection
+                  palettes={filteredSavedPalettes}
                   selectedId={palette.id}
+                  fallbackPalette={palettes[0]}
                   onSelect={onSelectPalette}
+                  hasSavedPalettes={savedPalettes.length > 0}
                 />
-              )}
+
+                <section>
+                  <button
+                    type="button"
+                    onClick={() => setPaletteListOpen((open) => !open)}
+                    aria-expanded={paletteListOpen}
+                    className="mb-3 flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition-colors"
+                    style={{
+                      backgroundColor: "var(--cf-muted)",
+                      color: "var(--cf-muted-foreground)",
+                    }}
+                  >
+                    <span className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
+                      Theme palettes
+                      <span
+                        className="rounded-full px-1.5 py-0.5 text-[9px] normal-case tracking-normal"
+                        style={{
+                          backgroundColor: "var(--cf-secondary)",
+                          color: "var(--cf-foreground)",
+                        }}
+                      >
+                        {filteredPalettes.length}
+                      </span>
+                    </span>
+
+                    {paletteListOpen ? (
+                      <ChevronDown size={14} aria-hidden="true" />
+                    ) : (
+                      <ChevronRight size={14} aria-hidden="true" />
+                    )}
+                  </button>
+
+                  {paletteListOpen && (
+                    <PaletteGallery
+                      palettes={filteredPalettes}
+                      selectedId={palette.id}
+                      onSelect={onSelectPalette}
+                    />
+                  )}
+                </section>
+              </div>
             </section>
 
             <div
@@ -208,14 +271,20 @@ export default function EditorSidebar({
       </div>
 
       <div
-        className="hidden items-center justify-between border-t px-4 py-3 text-[11px] lg:flex"
+        className="hidden shrink-0 items-center justify-between border-t px-5 py-3 text-[11px] lg:flex"
         style={{
           borderColor: "var(--cf-border)",
           color: "var(--cf-muted-foreground)",
         }}
       >
         <span>ColorForge Theme Editor</span>
-        <span>Live Preview</span>
+        <span className="flex items-center gap-1.5">
+          <span
+            className="size-1.5 rounded-full"
+            style={{ backgroundColor: "var(--cf-primary)" }}
+          />
+          Live Preview
+        </span>
       </div>
     </aside>
   );
