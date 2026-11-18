@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
-import { RotateCcw, Search, SlidersHorizontal } from "lucide-react";
+import { RotateCcw, Search, SlidersHorizontal, X } from "lucide-react";
 import { toast } from "sonner";
+
 import type { Palette } from "../../types";
 import { themeTokenDefinitions } from "../../data/themeTokens";
 import TokenGroup from "./palette-editor/TokenGroup";
@@ -43,6 +44,11 @@ export default function PaletteEditor({
       .filter((group) => group.tokens.length > 0);
   }, [search]);
 
+  const visibleTokenCount = filteredGroups.reduce(
+    (total, group) => total + group.tokens.length,
+    0,
+  );
+
   function updateColor(key: TokenKey, color: string) {
     onChange({
       ...palette,
@@ -84,6 +90,7 @@ export default function PaletteEditor({
   async function copyColor(key: TokenKey, label: string) {
     try {
       await navigator.clipboard.writeText(palette.tokens[key]);
+
       toast.success(`${label} copied`, {
         description: palette.tokens[key].toUpperCase(),
       });
@@ -105,6 +112,13 @@ export default function PaletteEditor({
   function handleReset() {
     setHexValues({});
     onReset();
+    toast.success("Colors reset", {
+      description: "Your palette colors have been restored.",
+    });
+  }
+
+  function clearSearch() {
+    setSearch("");
   }
 
   return (
@@ -116,7 +130,9 @@ export default function PaletteEditor({
             aria-hidden="true"
             style={{ color: "var(--cf-muted-foreground)" }}
           />
+
           <h3 className="text-sm font-semibold">Colors</h3>
+
           <span
             className="rounded-md px-1.5 py-0.5 text-[10px] tabular-nums"
             style={{
@@ -131,7 +147,7 @@ export default function PaletteEditor({
         <button
           type="button"
           onClick={handleReset}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1.5 text-xs transition-opacity hover:opacity-70"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-md px-2 py-1.5 text-xs transition-colors hover:opacity-70"
           style={{ color: "var(--cf-muted-foreground)" }}
         >
           <RotateCcw size={12} aria-hidden="true" />
@@ -139,8 +155,18 @@ export default function PaletteEditor({
         </button>
       </div>
 
+      <div
+        className="flex items-center justify-between gap-2 text-[11px]"
+        style={{ color: "var(--cf-muted-foreground)" }}
+      >
+        <span>Customize individual theme colors</span>
+        <span className="tabular-nums">
+          {visibleTokenCount} / {themeTokenDefinitions.length}
+        </span>
+      </div>
+
       <label
-        className="flex h-9 items-center gap-2 rounded-lg border px-3"
+        className="flex h-10 items-center gap-2 rounded-lg border px-3 transition-colors focus-within:border-(--cf-primary)"
         style={{
           borderColor: "var(--cf-border)",
           backgroundColor: "var(--cf-secondary)",
@@ -151,6 +177,7 @@ export default function PaletteEditor({
           aria-hidden="true"
           style={{ color: "var(--cf-muted-foreground)" }}
         />
+
         <input
           value={search}
           onChange={(event) => setSearch(event.target.value)}
@@ -158,14 +185,16 @@ export default function PaletteEditor({
           aria-label="Search color tokens"
           className="min-w-0 flex-1 bg-transparent text-xs outline-none placeholder:opacity-60"
         />
+
         {search && (
           <button
             type="button"
-            onClick={() => setSearch("")}
-            className="text-[10px]"
+            onClick={clearSearch}
+            aria-label="Clear token search"
+            className="rounded-md p-1 transition-opacity hover:opacity-70"
             style={{ color: "var(--cf-muted-foreground)" }}
           >
-            Clear
+            <X size={13} aria-hidden="true" />
           </button>
         )}
       </label>
@@ -190,7 +219,7 @@ export default function PaletteEditor({
 
         {filteredGroups.length === 0 && (
           <div
-            className="rounded-lg border px-4 py-8 text-center"
+            className="rounded-xl border border-dashed px-4 py-8 text-center"
             style={{ borderColor: "var(--cf-border)" }}
           >
             <Search
@@ -199,13 +228,27 @@ export default function PaletteEditor({
               aria-hidden="true"
               style={{ color: "var(--cf-muted-foreground)" }}
             />
+
             <p className="text-xs font-medium">No color tokens found</p>
+
             <p
               className="mt-1 text-[11px]"
               style={{ color: "var(--cf-muted-foreground)" }}
             >
               Try another name, such as primary or border.
             </p>
+
+            <button
+              type="button"
+              onClick={clearSearch}
+              className="mt-3 rounded-md px-3 py-1.5 text-xs font-medium transition-opacity hover:opacity-70"
+              style={{
+                backgroundColor: "var(--cf-secondary)",
+                color: "var(--cf-foreground)",
+              }}
+            >
+              Clear search
+            </button>
           </div>
         )}
       </div>

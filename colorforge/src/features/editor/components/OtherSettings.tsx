@@ -42,15 +42,17 @@ export default function OtherSettings() {
           </label>
 
           <div className="flex items-center gap-2">
-            <span
-              className="rounded-md border px-2 py-1 text-xs font-medium tabular-nums"
+            <output
+              htmlFor="border-radius"
+              className="min-w-14 rounded-md border px-2 py-1 text-center text-xs font-semibold tabular-nums"
               style={{
                 borderColor: "var(--cf-border)",
+                backgroundColor: "var(--cf-background)",
                 color: "var(--cf-foreground)",
               }}
             >
               {borderRadius}px
-            </span>
+            </output>
 
             {borderRadius !== 12 && (
               <button
@@ -78,6 +80,7 @@ export default function OtherSettings() {
           onChange={(event) => setBorderRadius(Number(event.target.value))}
           className="h-2 w-full cursor-pointer accent-(--cf-primary)"
           aria-label="Border radius in pixels"
+          aria-valuetext={`${borderRadius} pixels`}
         />
 
         <div
@@ -85,6 +88,7 @@ export default function OtherSettings() {
           style={{ color: "var(--cf-muted-foreground)" }}
         >
           <span>Sharp · 0px</span>
+          <span>Default · 12px</span>
           <span>Rounded · 24px</span>
         </div>
       </div>

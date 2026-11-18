@@ -1,4 +1,5 @@
 import { ChevronDown, ChevronRight } from "lucide-react";
+
 import type { ThemeTokens } from "../../../types";
 import type { TokenKey } from "./tokenGroups";
 import TokenRow from "./TokenRow";
@@ -38,36 +39,34 @@ export default function TokenGroup({
 }: TokenGroupProps) {
   return (
     <section
-      className="overflow-hidden rounded-lg border"
+      className="overflow-hidden rounded-xl border transition-colors"
       style={{ borderColor: "var(--cf-border)" }}
     >
       <button
         type="button"
         onClick={() => onToggle(id)}
         aria-expanded={!collapsed}
-        className="flex w-full items-center gap-2 px-3 py-2.5 text-left transition-colors hover:opacity-80"
+        className="flex w-full items-center gap-2.5 px-3 py-3 text-left transition-colors hover:opacity-80"
         style={{ backgroundColor: "var(--cf-secondary)" }}
       >
-        {collapsed ? (
-          <ChevronRight
-            size={14}
-            aria-hidden="true"
-            style={{ color: "var(--cf-muted-foreground)" }}
-          />
-        ) : (
-          <ChevronDown
-            size={14}
-            aria-hidden="true"
-            style={{ color: "var(--cf-muted-foreground)" }}
-          />
-        )}
+        <span style={{ color: "var(--cf-muted-foreground)" }}>
+          {collapsed ? (
+            <ChevronRight size={15} aria-hidden="true" />
+          ) : (
+            <ChevronDown size={15} aria-hidden="true" />
+          )}
+        </span>
 
-        <span className="flex-1 text-xs font-medium">{label}</span>
+        <span className="min-w-0 flex-1 text-xs font-semibold">{label}</span>
+
         <span
-          className="text-[10px] tabular-nums"
-          style={{ color: "var(--cf-muted-foreground)" }}
+          className="rounded-md px-2 py-1 text-[10px] font-medium tabular-nums"
+          style={{
+            backgroundColor: "var(--cf-background)",
+            color: "var(--cf-muted-foreground)",
+          }}
         >
-          {tokens.length}
+          {tokens.length} {tokens.length === 1 ? "token" : "tokens"}
         </span>
       </button>
 

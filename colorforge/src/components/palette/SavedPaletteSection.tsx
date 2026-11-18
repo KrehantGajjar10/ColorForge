@@ -100,13 +100,13 @@ export default function SavedPaletteSection({
         type="button"
         onClick={() => setIsOpen((open) => !open)}
         aria-expanded={isOpen}
-        className="mb-3 flex w-full items-center justify-between rounded-md px-2 py-2 text-left text-[10px] font-semibold uppercase tracking-[0.12em]"
+        className="mb-3 flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition-colors"
         style={{
           backgroundColor: "var(--cf-muted)",
           color: "var(--cf-muted-foreground)",
         }}
       >
-        <span className="flex items-center gap-2">
+        <span className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
           Saved palettes
           <span
             className="rounded-full px-1.5 py-0.5 text-[9px] normal-case tracking-normal"
