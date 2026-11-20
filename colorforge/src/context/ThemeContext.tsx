@@ -20,6 +20,7 @@ interface ThemeProviderProps {
 }
 
 const STORAGE_KEY = "colorforge-palette";
+const BASELINE_STORAGE_KEY = "colorforge-palette-baseline";
 const MODE_STORAGE_KEY = "colorforge-color-mode";
 const FONT_STORAGE_KEY = "colorforge-font-family";
 const RADIUS_STORAGE_KEY = "colorforge-border-radius";
@@ -87,6 +88,8 @@ function getPaletteFromUrl(): Palette | null {
     if (
       !isRecord(parsed) ||
       typeof parsed.id !== "string" ||
+      !parsed.id.trim() ||
+      parsed.id.length > 100 ||
       !isValidThemeTokens(parsed.tokens)
     ) {
       return null;
@@ -94,16 +97,35 @@ function getPaletteFromUrl(): Palette | null {
 
     const original = palettes.find((item) => item.id === parsed.id);
 
-    if (!original) {
+    const sharedName =
+      typeof parsed.name === "string" ? parsed.name.trim() : "";
+
+    const sharedDescription =
+      typeof parsed.description === "string" ? parsed.description.trim() : null;
+
+    const hasValidName = sharedName.length > 0 && sharedName.length <= 80;
+
+    const hasValidDescription =
+      sharedDescription !== null && sharedDescription.length <= 240;
+
+    if (!original && (!hasValidName || !hasValidDescription)) {
+      return null;
+    }
+
+    const name = hasValidName ? sharedName : original?.name;
+    const description = hasValidDescription
+      ? sharedDescription
+      : original?.description;
+
+    if (name === undefined || description === undefined) {
       return null;
     }
 
     return {
-      ...original,
-      tokens: {
-        ...original.tokens,
-        ...parsed.tokens,
-      },
+      id: parsed.id,
+      name,
+      description,
+      tokens: { ...parsed.tokens },
     };
   } catch {
     return null;
@@ -156,12 +178,72 @@ function getInitialPalette(): Palette {
   }
 }
 
+function getInitialPaletteBaseline(): Palette {
+  const sharedPalette = getPaletteFromUrl();
+
+  if (sharedPalette) {
+    return {
+      ...sharedPalette,
+      tokens: { ...sharedPalette.tokens },
+    };
+  }
+
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+
+    if (!stored) {
+      return palettes[0];
+    }
+
+    const parsed: unknown = JSON.parse(stored);
+
+    if (!isValidPalette(parsed)) {
+      return palettes[0];
+    }
+
+    const original = palettes.find((item) => item.id === parsed.id);
+
+    if (original) {
+      return original;
+    }
+
+    const savedPalette = getSavedPalettes().find(
+      (item) => item.id === parsed.id,
+    );
+
+    if (savedPalette) {
+      return savedPalette;
+    }
+
+    const storedBaseline = localStorage.getItem(BASELINE_STORAGE_KEY);
+
+    if (storedBaseline) {
+      const baseline: unknown = JSON.parse(storedBaseline);
+
+      if (isValidPalette(baseline) && baseline.id === parsed.id) {
+        return baseline;
+      }
+    }
+
+    return parsed;
+  } catch {
+    return palettes[0];
+  }
+}
+
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const [palette, setPalette] = useState<Palette>(getInitialPalette);
+
+  const [paletteBaseline, setPaletteBaseline] = useState<Palette>(
+    getInitialPaletteBaseline,
+  );
+
   const [colorMode, setColorMode] = useState<ColorMode>(getInitialColorMode);
+
   const [borderRadius, setBorderRadius] = useState<number>(
     getInitialBorderRadius,
   );
+
   const [fontFamily, setFontFamily] =
     useState<FontFamily>(getInitialFontFamily);
 
@@ -180,6 +262,17 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       // Keep the editor usable if storage is unavailable.
     }
   }, [palette]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(
+        BASELINE_STORAGE_KEY,
+        JSON.stringify(paletteBaseline),
+      );
+    } catch {
+      // Keep the reset baseline available for the current session.
+    }
+  }, [paletteBaseline]);
 
   useEffect(() => {
     document.documentElement.style.colorScheme = colorMode;
@@ -205,14 +298,25 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   }
 
   function selectPalette(nextPalette: Palette) {
-    setPalette(nextPalette);
+    const baseline = {
+      ...nextPalette,
+      tokens: { ...nextPalette.tokens },
+    };
+
+    setPaletteBaseline(baseline);
+    setPalette({
+      ...nextPalette,
+      tokens: { ...nextPalette.tokens },
+    });
   }
 
   function selectPaletteById(id: string) {
-    const nextPalette = palettes.find((item) => item.id === id);
+    const nextPalette =
+      palettes.find((item) => item.id === id) ??
+      getSavedPalettes().find((item) => item.id === id);
 
     if (nextPalette) {
-      setPalette(nextPalette);
+      selectPalette(nextPalette);
     }
   }
 
@@ -231,11 +335,10 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   }
 
   function resetPalette() {
-    const original = palettes.find((item) => item.id === palette.id);
-
-    if (original) {
-      setPalette(original);
-    }
+    setPalette({
+      ...paletteBaseline,
+      tokens: { ...paletteBaseline.tokens },
+    });
   }
 
   return (

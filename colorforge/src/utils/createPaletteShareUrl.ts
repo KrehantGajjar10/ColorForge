@@ -5,6 +5,8 @@ export function createPaletteShareUrl(palette: Palette): string {
 
   const sharedPalette = {
     id: palette.id,
+    name: palette.name,
+    description: palette.description,
     tokens: palette.tokens,
   };
 
