@@ -35,7 +35,7 @@ export default function PaletteCard({
         boxShadow: selected ? `0 0 0 1px ${primary}` : "none",
       }}
     >
-      <div className="flex h-16 overflow-hidden rounded-lg">
+      <div className="flex h-12 overflow-hidden rounded-lg sm:h-16">
         {[background, secondary, primary, accent].map((color) => (
           <div
             key={color}
@@ -45,8 +45,10 @@ export default function PaletteCard({
         ))}
       </div>
 
-      <div className="mt-3 flex items-center justify-between gap-2">
-        <span className="text-sm font-semibold">{palette.name}</span>
+      <div className="mt-2 flex min-w-0 items-center justify-between gap-2 sm:mt-3">
+        <span className="min-w-0 truncate text-xs font-semibold sm:text-sm">
+          {palette.name}
+        </span>
 
         {selected && (
           <span
@@ -61,7 +63,10 @@ export default function PaletteCard({
         )}
       </div>
 
-      <p className="mt-1 text-xs leading-5" style={{ color: mutedForeground }}>
+      <p
+        className="mt-1 line-clamp-2 text-[11px] leading-4 sm:text-xs sm:leading-5"
+        style={{ color: mutedForeground }}
+      >
         {palette.description}
       </p>
     </button>

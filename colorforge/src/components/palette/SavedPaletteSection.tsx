@@ -183,7 +183,7 @@ export default function SavedPaletteSection({
               </p>
             </div>
           ) : (
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid grid-cols-2 gap-2">
               {sortedPalettes.map((item) => {
                 const selected = selectedId === item.id;
                 const favorite = favorites.includes(item.id);

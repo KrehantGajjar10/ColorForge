@@ -48,7 +48,7 @@ export default function EditorSidebar({
 
   return (
     <aside
-      className="flex max-h-[42%] min-h-0 w-full shrink-0 flex-col border-b lg:h-full lg:max-h-none lg:w-90 lg:border-b-0 lg:border-r xl:w-100"
+      className="flex h-[44%] min-h-0 w-full shrink-0 flex-col border-b lg:h-full lg:max-h-none lg:w-90 lg:border-b-0 lg:border-r xl:w-100"
       style={{
         borderColor: "var(--cf-border)",
         backgroundColor: "var(--cf-background)",
@@ -56,7 +56,7 @@ export default function EditorSidebar({
       aria-label="Theme settings"
     >
       <div
-        className="shrink-0 border-b px-4 pb-3 pt-4 sm:px-5"
+        className="shrink-0 border-b px-3 pb-3 pt-3 sm:px-5 sm:pt-4"
         style={{ borderColor: "var(--cf-border)" }}
       >
         <div className="mb-4 flex items-center gap-3">
@@ -123,7 +123,7 @@ export default function EditorSidebar({
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-5">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3 sm:p-5">
         {settingsTab === "colors" && (
           <div className="space-y-6">
             <section>
