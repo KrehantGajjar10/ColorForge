@@ -1,6 +1,6 @@
-import { PanelsTopLeft, Type, WandSparkles } from "lucide-react";
+import { PanelsTopLeft, ShieldCheck, Type, WandSparkles } from "lucide-react";
 
-export type SettingsTab = "colors" | "typography" | "other";
+export type SettingsTab = "colors" | "typography" | "other" | "accessibility";
 
 export type PreviewMode = "cards" | "dashboard" | "application" | "marketing";
 
@@ -8,6 +8,7 @@ export const settingTabs = [
   { id: "colors", label: "Colors", icon: PanelsTopLeft },
   { id: "typography", label: "Typography", icon: Type },
   { id: "other", label: "Other", icon: WandSparkles },
+  { id: "accessibility", label: "Accessibility", icon: ShieldCheck },
 ] satisfies {
   id: SettingsTab;
   label: string;

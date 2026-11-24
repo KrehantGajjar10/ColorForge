@@ -6,6 +6,7 @@ import PaletteGallery from "../../../components/palette/PaletteGallery";
 import SavedPaletteSection from "../../../components/palette/SavedPaletteSection";
 import TypographySettings from "./TypographySettings";
 import OtherSettings from "./OtherSettings";
+import AccessibilitySettings from "./AccessibilitySettings";
 
 import type { Palette as PaletteType } from "../../../types";
 import type { FontFamily } from "../../../context/theme-context";
@@ -85,7 +86,7 @@ export default function EditorSidebar({
         </div>
 
         <div
-          className="grid grid-cols-3 gap-1 rounded-xl border p-1"
+          className="grid grid-cols-4 gap-1 rounded-xl border p-1"
           style={{
             borderColor: "var(--cf-border)",
             backgroundColor: "var(--cf-muted)",
@@ -268,6 +269,13 @@ export default function EditorSidebar({
         )}
 
         {settingsTab === "other" && <OtherSettings />}
+
+        {settingsTab === "accessibility" && (
+          <AccessibilitySettings
+            key={`${palette.id}-${palette.tokens.primary}-${palette.tokens.primaryForeground}`}
+            palette={palette}
+          />
+        )}
       </div>
 
       <div
