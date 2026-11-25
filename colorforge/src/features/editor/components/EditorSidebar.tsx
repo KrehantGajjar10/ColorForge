@@ -6,7 +6,7 @@ import PaletteGallery from "../../../components/palette/PaletteGallery";
 import SavedPaletteSection from "../../../components/palette/SavedPaletteSection";
 import TypographySettings from "./TypographySettings";
 import OtherSettings from "./OtherSettings";
-import AccessibilitySettings from "./AccessibilitySettings";
+import AccessibilitySettings from "./accessibility/AccessibilitySettings";
 
 import type { Palette as PaletteType } from "../../../types";
 import type { FontFamily } from "../../../context/theme-context";
