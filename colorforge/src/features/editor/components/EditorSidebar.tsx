@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useId, useRef, useState } from "react";
+import type { KeyboardEvent } from "react";
 import { ChevronDown, ChevronRight, Palette, Search } from "lucide-react";
 
 import PaletteEditor from "../../../components/palette/PaletteEditor";
@@ -37,6 +38,14 @@ export default function EditorSidebar({
   const [search, setSearch] = useState("");
   const [paletteListOpen, setPaletteListOpen] = useState(true);
 
+  const tablistId = useId();
+  const tabRefs = useRef<Record<SettingsTab, HTMLButtonElement | null>>({
+    colors: null,
+    typography: null,
+    other: null,
+    accessibility: null,
+  });
+
   const normalizedSearch = search.trim().toLowerCase();
 
   const filteredPalettes = palettes.filter((item) =>
@@ -46,6 +55,47 @@ export default function EditorSidebar({
   const filteredSavedPalettes = savedPalettes.filter((item) =>
     item.name.toLowerCase().includes(normalizedSearch),
   );
+
+  const getTabId = (tab: SettingsTab) => `${tablistId}-tab-${tab}`;
+  const panelId = `${tablistId}-panel`;
+
+  const handleTabKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    currentTab: SettingsTab,
+  ) => {
+    const currentIndex = settingTabs.findIndex((tab) => tab.id === currentTab);
+
+    let nextIndex: number;
+
+    switch (event.key) {
+      case "ArrowRight":
+        nextIndex = (currentIndex + 1) % settingTabs.length;
+        break;
+
+      case "ArrowLeft":
+        nextIndex =
+          (currentIndex - 1 + settingTabs.length) % settingTabs.length;
+        break;
+
+      case "Home":
+        nextIndex = 0;
+        break;
+
+      case "End":
+        nextIndex = settingTabs.length - 1;
+        break;
+
+      default:
+        return;
+    }
+
+    event.preventDefault();
+
+    const nextTab = settingTabs[nextIndex];
+
+    setSettingsTab(nextTab.id);
+    tabRefs.current[nextTab.id]?.focus();
+  };
 
   return (
     <aside
@@ -101,10 +151,17 @@ export default function EditorSidebar({
             return (
               <button
                 key={tab.id}
+                ref={(element) => {
+                  tabRefs.current[tab.id] = element;
+                }}
+                id={getTabId(tab.id)}
                 type="button"
                 role="tab"
                 aria-selected={active}
+                aria-controls={panelId}
+                tabIndex={active ? 0 : -1}
                 onClick={() => setSettingsTab(tab.id)}
+                onKeyDown={(event) => handleTabKeyDown(event, tab.id)}
                 className="flex h-9 min-w-0 items-center justify-center gap-1.5 rounded-lg px-1.5 text-xs font-medium transition-all duration-200 sm:gap-2 sm:px-2"
                 style={{
                   backgroundColor: active
@@ -124,7 +181,13 @@ export default function EditorSidebar({
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3 sm:p-5">
+      <div
+        id={panelId}
+        role="tabpanel"
+        aria-labelledby={getTabId(settingsTab)}
+        tabIndex={0}
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-3 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-(--cf-primary) sm:p-5"
+      >
         {settingsTab === "colors" && (
           <div className="space-y-6">
             <section>
