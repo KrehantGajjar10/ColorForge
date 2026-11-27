@@ -1,6 +1,6 @@
 import { useId, useRef, useState } from "react";
 import type { KeyboardEvent } from "react";
-import { ChevronDown, ChevronRight, Palette, Search } from "lucide-react";
+import { ChevronDown, ChevronRight, Palette, Search, X } from "lucide-react";
 
 import PaletteEditor from "../../../components/palette/PaletteEditor";
 import PaletteGallery from "../../../components/palette/PaletteGallery";
@@ -55,6 +55,11 @@ export default function EditorSidebar({
   const filteredSavedPalettes = savedPalettes.filter((item) =>
     item.name.toLowerCase().includes(normalizedSearch),
   );
+
+  const hasNoSearchResults =
+    normalizedSearch.length > 0 &&
+    filteredSavedPalettes.length === 0 &&
+    filteredPalettes.length === 0;
 
   const getTabId = (tab: SettingsTab) => `${tablistId}-tab-${tab}`;
   const panelId = `${tablistId}-panel`;
@@ -239,7 +244,7 @@ export default function EditorSidebar({
                 </span>
               </div>
 
-              <label
+              <div
                 className="mb-5 flex h-10 items-center gap-2 rounded-lg border px-3 transition-colors focus-within:border-(--cf-primary)"
                 style={{
                   borderColor: "var(--cf-border)",
@@ -249,8 +254,10 @@ export default function EditorSidebar({
                 <Search
                   size={15}
                   aria-hidden="true"
+                  className="shrink-0"
                   style={{ color: "var(--cf-muted-foreground)" }}
                 />
+
                 <input
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
@@ -258,57 +265,109 @@ export default function EditorSidebar({
                   className="min-w-0 flex-1 bg-transparent text-xs outline-none placeholder:opacity-60"
                   aria-label="Search saved and theme palettes"
                 />
-              </label>
 
-              <div className="space-y-6">
-                <SavedPaletteSection
-                  palettes={filteredSavedPalettes}
-                  selectedId={palette.id}
-                  fallbackPalette={palettes[0]}
-                  onSelect={onSelectPalette}
-                  hasSavedPalettes={savedPalettes.length > 0}
-                />
-
-                <section>
+                {search.length > 0 && (
                   <button
                     type="button"
-                    onClick={() => setPaletteListOpen((open) => !open)}
-                    aria-expanded={paletteListOpen}
-                    className="mb-3 flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition-colors"
+                    onClick={() => setSearch("")}
+                    aria-label="Clear palette search"
+                    title="Clear search"
+                    className="flex size-6 shrink-0 items-center justify-center rounded-md transition-colors hover:bg-(--cf-muted) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--cf-primary)"
+                    style={{ color: "var(--cf-muted-foreground)" }}
+                  >
+                    <X size={14} aria-hidden="true" />
+                  </button>
+                )}
+              </div>
+
+              {hasNoSearchResults ? (
+                <div
+                  className="rounded-xl border border-dashed px-4 py-7 text-center"
+                  style={{
+                    borderColor: "var(--cf-border)",
+                    backgroundColor: "var(--cf-secondary)",
+                  }}
+                >
+                  <Search
+                    size={19}
+                    className="mx-auto mb-2"
+                    aria-hidden="true"
+                    style={{ color: "var(--cf-muted-foreground)" }}
+                  />
+
+                  <p className="text-xs font-semibold">No palettes found</p>
+
+                  <p
+                    className="mt-1 text-[11px] leading-5"
+                    style={{ color: "var(--cf-muted-foreground)" }}
+                  >
+                    No saved or theme palettes match "{search.trim()}". Try a
+                    different name or clear your search.
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => setSearch("")}
+                    className="mt-3 rounded-lg px-3 py-2 text-xs font-medium transition-opacity hover:opacity-75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--cf-primary)"
                     style={{
-                      backgroundColor: "var(--cf-muted)",
-                      color: "var(--cf-muted-foreground)",
+                      backgroundColor: "var(--cf-primary)",
+                      color: "var(--cf-primary-foreground)",
                     }}
                   >
-                    <span className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
-                      Theme palettes
-                      <span
-                        className="rounded-full px-1.5 py-0.5 text-[9px] normal-case tracking-normal"
-                        style={{
-                          backgroundColor: "var(--cf-secondary)",
-                          color: "var(--cf-foreground)",
-                        }}
-                      >
-                        {filteredPalettes.length}
-                      </span>
-                    </span>
-
-                    {paletteListOpen ? (
-                      <ChevronDown size={14} aria-hidden="true" />
-                    ) : (
-                      <ChevronRight size={14} aria-hidden="true" />
-                    )}
+                    Clear search
                   </button>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <SavedPaletteSection
+                    palettes={filteredSavedPalettes}
+                    selectedId={palette.id}
+                    fallbackPalette={palettes[0]}
+                    onSelect={onSelectPalette}
+                    hasSavedPalettes={savedPalettes.length > 0}
+                  />
 
-                  {paletteListOpen && (
-                    <PaletteGallery
-                      palettes={filteredPalettes}
-                      selectedId={palette.id}
-                      onSelect={onSelectPalette}
-                    />
-                  )}
-                </section>
-              </div>
+                  <section>
+                    <button
+                      type="button"
+                      onClick={() => setPaletteListOpen((open) => !open)}
+                      aria-expanded={paletteListOpen}
+                      className="mb-3 flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition-colors"
+                      style={{
+                        backgroundColor: "var(--cf-muted)",
+                        color: "var(--cf-muted-foreground)",
+                      }}
+                    >
+                      <span className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.12em]">
+                        Theme palettes
+                        <span
+                          className="rounded-full px-1.5 py-0.5 text-[9px] normal-case tracking-normal"
+                          style={{
+                            backgroundColor: "var(--cf-secondary)",
+                            color: "var(--cf-foreground)",
+                          }}
+                        >
+                          {filteredPalettes.length}
+                        </span>
+                      </span>
+
+                      {paletteListOpen ? (
+                        <ChevronDown size={14} aria-hidden="true" />
+                      ) : (
+                        <ChevronRight size={14} aria-hidden="true" />
+                      )}
+                    </button>
+
+                    {paletteListOpen && (
+                      <PaletteGallery
+                        palettes={filteredPalettes}
+                        selectedId={palette.id}
+                        onSelect={onSelectPalette}
+                      />
+                    )}
+                  </section>
+                </div>
+              )}
             </section>
 
             <div
